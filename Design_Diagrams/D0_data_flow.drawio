@@ -1,0 +1,379 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="A - Call and consent">
+    <mxGraphModel page="1" pageWidth="1600" pageHeight="1160" grid="1" gridSize="10" background="#FFFFFF">
+      <root>
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
+        <mxCell id="title" value="In-Home Assistive Robot | D0 data flow A - call and consent" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=31.5;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="15" width="1530" height="50" />
+        </mxCell>
+        <mxCell id="goal" value="Goal: resident-controlled family video calls and room-to-room following on request;&#10;following switches off if the robot loses the resident or a safety check fails." style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=23.5;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="75" width="1530" height="60" />
+        </mxCell>
+        <mxCell id="caregiver" value="Caregiver" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;shape=umlActor;fillColor=#FFFFFF;strokeColor=#20313B;strokeWidth=2;verticalLabelPosition=bottom;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="45" y="380" width="65" height="100" />
+        </mxCell>
+        <mxCell id="resident" value="Resident" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;shape=umlActor;fillColor=#FFFFFF;strokeColor=#20313B;strokeWidth=2;verticalLabelPosition=bottom;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1440" y="665" width="65" height="100" />
+        </mxCell>
+        <mxCell id="C7" value="Caregiver app&#10;request / call outcome" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=25.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="220" y="370" width="220" height="110" />
+        </mxCell>
+        <mxCell id="C6" value="Call server&#10;authenticated call state" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=24.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;verticalAlign=top;spacingTop=12;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="600" y="370" width="240" height="180" />
+        </mxCell>
+        <mxCell id="C2" value="Call manager&#10;resident permission + acceptance" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=25.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;verticalAlign=top;spacingTop=12;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1000" y="370" width="250" height="180" />
+        </mxCell>
+        <mxCell id="D2" value="Call history&#10;outcome / last-seen" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=19.5;fontColor=#20313B;align=center;shape=partialRectangle;right=0;fillColor=#FFFFFF;strokeColor=#126D9B;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="620" y="480" width="200" height="55" />
+        </mxCell>
+        <mxCell id="D1" value="Resident permissions&#10;CALL, FOLLOW, privacy" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=17.5;fontColor=#20313B;align=center;shape=partialRectangle;right=0;fillColor=#FFFFFF;strokeColor=#126D9B;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1020" y="480" width="210" height="55" />
+        </mxCell>
+        <mxCell id="C1" value="Resident controls&#10;caller / answer / camera state" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=25.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1000" y="665" width="250" height="100" />
+        </mxCell>
+        <mxCell id="C3" value="Audio/video calling&#10;permitted live media" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=25.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="600" y="665" width="240" height="100" />
+        </mxCell>
+        <mxCell id="E1" value="Robot platform&#10;camera, mic, speaker, display" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="600" y="870" width="240" height="85" />
+        </mxCell>
+        <mxCell id="E2" value="Sign-in service&#10;account verification" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=22.5;fontColor=#20313B;align=center;rounded=0;dashed=1;fillColor=#F2F3F3;strokeColor=#737D84;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="650" y="200" width="300" height="80" />
+        </mxCell>
+        <mxCell id="E3" value="Optional media relay&#10;encrypted packets only" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;rounded=0;dashed=1;fillColor=#F2F3F3;strokeColor=#737D84;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="220" y="665" width="220" height="100" />
+        </mxCell>
+        <mxCell id="I16" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#6E777C;endArrow=block;endFill=1;startArrow=block;startFill=1;dashed=1;exitX=1.0;exitY=0.4;exitPerimeter=0;entryX=0.0;entryY=0.45454545454545453;entryPerimeter=0;" edge="1" parent="1" source="caregiver" target="C7" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="110" y="420" />
+            <mxPoint as="targetPoint" x="220" y="420" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I16_label" value="I16 actions&#10;and A/V" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=19;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="113" y="350" width="100" height="65" />
+        </mxCell>
+        <mxCell id="I13" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;startArrow=block;startFill=1;exitX=0.5;exitY=0.0;exitPerimeter=0;entryX=0.0;entryY=0.5;entryPerimeter=0;" edge="1" parent="1" source="C7" target="E2" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="330" y="370" />
+            <mxPoint as="targetPoint" x="650" y="240" />
+            <Array as="points">
+              <mxPoint x="330" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I13_label" value="I13 sign-in&#10;request / result" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="365" y="245" width="260" height="55" />
+        </mxCell>
+        <mxCell id="I14" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;startArrow=block;startFill=1;exitX=0.75;exitY=0.0;exitPerimeter=0;entryX=0.43333333333333335;entryY=1.0;entryPerimeter=0;" edge="1" parent="1" source="C6" target="E2" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="780" y="370" />
+            <mxPoint as="targetPoint" x="780" y="280" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I14_label" value="I14 identity check&#10;request / result" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="795" y="280" width="200" height="50" />
+        </mxCell>
+        <mxCell id="I1req" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=1.0;exitY=0.3181818181818182;exitPerimeter=0;entryX=0.0;entryY=0.19444444444444445;entryPerimeter=0;" edge="1" parent="1" source="C7" target="C6" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="440" y="405" />
+            <mxPoint as="targetPoint" x="600" y="405" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I1req_label" value="I1 call request&#10;JSON record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=19.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="443" y="335" width="155" height="65" />
+        </mxCell>
+        <mxCell id="I1status" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=0.0;exitY=0.4722222222222222;exitPerimeter=0;entryX=1.0;entryY=0.7727272727272727;entryPerimeter=0;" edge="1" parent="1" source="C6" target="C7" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="600" y="455" />
+            <mxPoint as="targetPoint" x="440" y="455" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I1status_label" value="I1 call status&#10;JSON record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=19.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="443" y="465" width="155" height="65" />
+        </mxCell>
+        <mxCell id="I2invite" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=1.0;exitY=0.19444444444444445;exitPerimeter=0;entryX=0.0;entryY=0.19444444444444445;entryPerimeter=0;" edge="1" parent="1" source="C6" target="C2" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="840" y="405" />
+            <mxPoint as="targetPoint" x="1000" y="405" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I2invite_label" value="I2 call invitation&#10;JSON record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=19.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="843" y="335" width="155" height="65" />
+        </mxCell>
+        <mxCell id="I2event" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=0.0;exitY=0.4722222222222222;exitPerimeter=0;entryX=1.0;entryY=0.4722222222222222;entryPerimeter=0;" edge="1" parent="1" source="C2" target="C6" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="1000" y="455" />
+            <mxPoint as="targetPoint" x="840" y="455" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I2event_label" value="I2 response / status&#10;JSON record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=18;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="843" y="465" width="155" height="65" />
+        </mxCell>
+        <mxCell id="I3view" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=0.7;exitY=1.0;exitPerimeter=0;entryX=0.7;entryY=0.0;entryPerimeter=0;" edge="1" parent="1" source="C2" target="C1" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="1175" y="550" />
+            <mxPoint as="targetPoint" x="1175" y="665" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I3view_label" value="I3 caller / state&#10;local record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1185" y="577" width="180" height="60" />
+        </mxCell>
+        <mxCell id="I3intent" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=0.12;exitY=0.0;exitPerimeter=0;entryX=0.12;entryY=1.0;entryPerimeter=0;" edge="1" parent="1" source="C1" target="C2" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="1030" y="665" />
+            <mxPoint as="targetPoint" x="1030" y="550" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I3intent_label" value="I3 answer / privacy&#10;intent record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=18.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1005" y="575" width="160" height="65" />
+        </mxCell>
+        <mxCell id="I15" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#6E777C;endArrow=block;endFill=1;startArrow=block;startFill=1;dashed=1;exitX=1.0;exitY=0.5;exitPerimeter=0;entryX=0.0;entryY=0.5;entryPerimeter=0;" edge="1" parent="1" source="C1" target="resident" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="1250" y="715" />
+            <mxPoint as="targetPoint" x="1440" y="715" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I15_label" value="I15 named caller /&#10;answer; text + action" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=18.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1260" y="645" width="170" height="65" />
+        </mxCell>
+        <mxCell id="I5" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;startArrow=block;startFill=1;exitX=0.0;exitY=0.9444444444444444;exitPerimeter=0;entryX=1.0;entryY=0.5;entryPerimeter=0;" edge="1" parent="1" source="C2" target="C3" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="1000" y="540" />
+            <mxPoint as="targetPoint" x="840" y="715" />
+            <Array as="points">
+              <mxPoint x="960" y="540" />
+              <mxPoint x="960" y="715" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I5_label" value="I5 call permission /&#10;media status" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="740" y="575" width="200" height="75" />
+        </mxCell>
+        <mxCell id="I10" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;startArrow=block;startFill=1;exitX=0.5;exitY=0.0;exitPerimeter=0;entryX=0.5;entryY=1.0;entryPerimeter=0;" edge="1" parent="1" source="E1" target="C3" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="720" y="870" />
+            <mxPoint as="targetPoint" x="720" y="765" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I10_label" value="I10 live audio / video&#10;device data" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="735" y="800" width="240" height="60" />
+        </mxCell>
+        <mxCell id="I12a" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;startArrow=block;startFill=1;exitX=0.0;exitY=0.5;exitPerimeter=0;entryX=1.0;entryY=0.5;entryPerimeter=0;" edge="1" parent="1" source="C3" target="E3" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="600" y="715" />
+            <mxPoint as="targetPoint" x="440" y="715" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I12a_label" value="I12 via relay&#10;A/V packets" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=20.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="443" y="645" width="155" height="60" />
+        </mxCell>
+        <mxCell id="I12b" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;startArrow=block;startFill=1;exitX=0.5;exitY=0.0;exitPerimeter=0;entryX=0.5;entryY=1.0;entryPerimeter=0;" edge="1" parent="1" source="E3" target="C7" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="330" y="665" />
+            <mxPoint as="targetPoint" x="330" y="480" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I12b_label" value="I12 encrypted&#10;A/V packets" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="140" y="550" width="180" height="60" />
+        </mxCell>
+        <mxCell id="timing" value="Timing targets: caller shown within 2 s; answer status within 2 s; offline after 5 s; no answer after 60 s.&#10;The resident accepts before call audio and video are used. Physical and end-to-end behavior needs testing." style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="964" width="1530" height="50" />
+        </mxCell>
+        <mxCell id="legend" value="Blue rounded boxes: parts we build. Gray dashed boxes: outside services. Figures: people.&#10;Arrows show data direction; I1-I16 match the interface table. Red: wired Stop/Privacy. Gray dashed: human input/output.&#10;Dashed blue outlines: software location. Open-ended boxes: stored permissions or call history.&#10;Repeated robot-platform boxes show different connections to the same physical assembly." style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=24.5;fontColor=#20313B;align=center;rounded=0;fillColor=#F7F9FA;strokeColor=#C9D2D7;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="1020" width="1530" height="125" />
+        </mxCell>
+        <mxCell id="I12direct" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;startArrow=block;startFill=1;exitX=0.20833333333333334;exitY=0.0;exitPerimeter=0;entryX=0.8181818181818182;entryY=1.0;entryPerimeter=0;" edge="1" parent="1" source="C3" target="C7">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="650" y="665" />
+            <mxPoint as="targetPoint" x="400" y="480" />
+            <Array as="points">
+              <mxPoint x="650" y="610" />
+              <mxPoint x="480" y="610" />
+              <mxPoint x="480" y="540" />
+              <mxPoint x="400" y="540" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I12direct_label" value="I12 direct&#10;A/V packets" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=19.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="500" y="550" width="150" height="55" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="B - Following and stop">
+    <mxGraphModel page="1" pageWidth="1600" pageHeight="1160" grid="1" gridSize="10" background="#FFFFFF">
+      <root>
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
+        <mxCell id="title" value="In-Home Assistive Robot | D0 data flow B - following and stop" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=31.5;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="15" width="1530" height="50" />
+        </mxCell>
+        <mxCell id="goal" value="Goal: resident-controlled family video calls and room-to-room following on request;&#10;following switches off if the robot loses the resident or a safety check fails." style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=23.5;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="75" width="1530" height="60" />
+        </mxCell>
+        <mxCell id="resident" value="Resident" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;shape=umlActor;fillColor=#FFFFFF;strokeColor=#20313B;strokeWidth=2;verticalLabelPosition=bottom;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="350" width="65" height="100" />
+        </mxCell>
+        <mxCell id="C1" value="Resident controls&#10;Follow / select / Stop / Privacy" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=25.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="210" y="340" width="220" height="110" />
+        </mxCell>
+        <mxCell id="C2" value="Call manager&#10;CALL + FOLLOW + connected call" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=25.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="560" y="340" width="260" height="110" />
+        </mxCell>
+        <mxCell id="C4" value="Person tracking&#10;selected person + valid range" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=25.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="340" width="260" height="110" />
+        </mxCell>
+        <mxCell id="C5" value="Motion control&#10;permission + safety&#10;move / stop request" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=25.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="710" width="260" height="115" />
+        </mxCell>
+        <mxCell id="E1sense" value="Robot platform&#10;image and distance&#10;sensors" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=22.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="535" width="260" height="95" />
+        </mxCell>
+        <mxCell id="E1base" value="Robot platform&#10;custom chassis / mechanisms&#10;motors and sensors" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=22.5;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="560" y="710" width="260" height="115" />
+        </mxCell>
+        <mxCell id="I15" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#6E777C;endArrow=block;endFill=1;startArrow=block;startFill=1;dashed=1;exitX=1.0;exitY=0.45;exitPerimeter=0;entryX=0.0;entryY=0.5;entryPerimeter=0;" edge="1" parent="1" source="resident" target="C1" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="105" y="395" />
+            <mxPoint as="targetPoint" x="210" y="395" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I15_label" value="I15&#10;local I/O" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=19.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="110" y="330" width="95" height="60" />
+        </mxCell>
+        <mxCell id="I3intent" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=1.0;exitY=0.3181818181818182;exitPerimeter=0;entryX=0.0;entryY=0.3181818181818182;entryPerimeter=0;" edge="1" parent="1" source="C1" target="C2" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="430" y="375" />
+            <mxPoint as="targetPoint" x="560" y="375" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I3intent_label" value="I3 selection /&#10;Follow intent record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=18.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="433" y="305" width="125" height="65" />
+        </mxCell>
+        <mxCell id="I3view" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=0.0;exitY=0.7727272727272727;exitPerimeter=0;entryX=1.0;entryY=0.7727272727272727;entryPerimeter=0;" edge="1" parent="1" source="C2" target="C1" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="560" y="425" />
+            <mxPoint as="targetPoint" x="430" y="425" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I3view_label" value="I3 status / prompt&#10;local record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=17.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="433" y="455" width="125" height="60" />
+        </mxCell>
+        <mxCell id="I8permit" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=1.0;exitY=0.3181818181818182;exitPerimeter=0;entryX=0.0;entryY=0.3181818181818182;entryPerimeter=0;" edge="1" parent="1" source="C2" target="C4" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="820" y="375" />
+            <mxPoint as="targetPoint" x="980" y="375" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I8permit_label" value="I8 person selection +&#10;permission record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=18.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="823" y="305" width="155" height="65" />
+        </mxCell>
+        <mxCell id="I8state" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=0.0;exitY=0.7727272727272727;exitPerimeter=0;entryX=1.0;entryY=0.7727272727272727;entryPerimeter=0;" edge="1" parent="1" source="C4" target="C2" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="980" y="425" />
+            <mxPoint as="targetPoint" x="820" y="425" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I8state_label" value="I8 tracking status&#10;local record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=19.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="823" y="455" width="155" height="60" />
+        </mxCell>
+        <mxCell id="I9" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;startArrow=block;startFill=1;exitX=0.5;exitY=0.0;exitPerimeter=0;entryX=0.5;entryY=1.0;entryPerimeter=0;" edge="1" parent="1" source="E1sense" target="C4" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="1110" y="535" />
+            <mxPoint as="targetPoint" x="1110" y="450" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I9_label" value="I9 raw image /&#10;distance data" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1000" y="465" width="230" height="65" />
+        </mxCell>
+        <mxCell id="I7" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=1.0;exitY=0.5;exitPerimeter=0;entryX=0.8846153846153846;entryY=0.0;entryPerimeter=0;" edge="1" parent="1" source="C4" target="C5" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="1240" y="395" />
+            <mxPoint as="targetPoint" x="1210" y="710" />
+            <Array as="points">
+              <mxPoint x="1260" y="395" />
+              <mxPoint x="1260" y="685" />
+              <mxPoint x="1210" y="685" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I7_label" value="I7 selected person&#10;position / availability&#10;location record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1320" y="550" width="245" height="90" />
+        </mxCell>
+        <mxCell id="I6permit" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=0.34615384615384615;exitY=1.0;exitPerimeter=0;entryX=0.21153846153846154;entryY=0.0;entryPerimeter=0;" edge="1" parent="1" source="C2" target="C5" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="650" y="450" />
+            <mxPoint as="targetPoint" x="1035" y="710" />
+            <Array as="points">
+              <mxPoint x="650" y="645" />
+              <mxPoint x="1035" y="645" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I6permit_label" value="I6 enable Follow /&#10;permission record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="690" y="600" width="215" height="60" />
+        </mxCell>
+        <mxCell id="I6state" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=1.0;exitY=0.8695652173913043;exitPerimeter=0;entryX=0.9230769230769231;entryY=0.0;entryPerimeter=0;" edge="1" parent="1" source="C5" target="C2" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="1240" y="810" />
+            <mxPoint as="targetPoint" x="800" y="340" />
+            <Array as="points">
+              <mxPoint x="1300" y="810" />
+              <mxPoint x="1300" y="280" />
+              <mxPoint x="800" y="280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I6state_label" value="I6 movement status&#10;local record" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="965" y="210" width="300" height="55" />
+        </mxCell>
+        <mxCell id="I11cmd" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=0.0;exitY=0.30434782608695654;exitPerimeter=0;entryX=1.0;entryY=0.30434782608695654;entryPerimeter=0;" edge="1" parent="1" source="C5" target="E1base" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="980" y="745" />
+            <mxPoint as="targetPoint" x="820" y="745" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I11cmd_label" value="I11 movement&#10;command" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=19.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="823" y="675" width="155" height="65" />
+        </mxCell>
+        <mxCell id="I11feedback" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=block;endFill=1;exitX=1.0;exitY=0.782608695652174;exitPerimeter=0;entryX=0.0;entryY=0.782608695652174;entryPerimeter=0;" edge="1" parent="1" source="E1base" target="C5" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="820" y="800" />
+            <mxPoint as="targetPoint" x="980" y="800" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I11feedback_label" value="I11 platform&#10;sensor readings" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=19;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="823" y="815" width="155" height="60" />
+        </mxCell>
+        <mxCell id="I4" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#C13A32;endArrow=block;endFill=1;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.5;entryY=1.0;entryPerimeter=0;" edge="1" parent="1" source="C1" target="C5" value="">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="320" y="450" />
+            <mxPoint as="targetPoint" x="1110" y="825" />
+            <Array as="points">
+              <mxPoint x="320" y="510" />
+              <mxPoint x="20" y="510" />
+              <mxPoint x="20" y="900" />
+              <mxPoint x="1110" y="900" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I4_label" value="I4 Stop / Privacy: direct digital stop request" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=22.5;fontColor=#20313B;align=center;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="380" y="905" width="650" height="35" />
+        </mxCell>
+        <mxCell id="boundary_note" value="Following requires:&#10;- a resident request&#10;- the selected person to be tracked&#10;- safety information from the robot&#10;&#10;If any are unavailable, request a stop.&#10;Physical stopping still needs testing." style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=23.5;fontColor=#20313B;align=center;rounded=0;fillColor=#F7F9FA;strokeColor=#C9D2D7;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="560" width="435" height="260" />
+        </mxCell>
+        <mxCell id="timing" value="Targets: speed &lt;= 0.2 m/s; request zero within 1 s of loss; settle within 25 mm of the loss point.&#10;Within 10 s, speed stays below 5 mm/s for 1 s. Resident must request following again; call may continue.&#10;Physical stopping and fault behavior must be tested on the built robot." style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=21.5;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="939" width="1530" height="75" />
+        </mxCell>
+        <mxCell id="legend" value="Blue rounded boxes: parts we build. Gray dashed boxes: outside services. Figures: people.&#10;Arrows show data direction; I1-I16 match the interface table. Red: wired Stop/Privacy. Gray dashed: human input/output.&#10;Dashed blue outlines: software location. Open-ended boxes: stored permissions or call history.&#10;Repeated robot-platform boxes show different connections to the same physical assembly." style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=24.5;fontColor=#20313B;align=center;rounded=0;fillColor=#F7F9FA;strokeColor=#C9D2D7;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="1020" width="1530" height="125" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
