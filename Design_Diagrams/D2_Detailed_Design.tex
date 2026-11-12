@@ -1,0 +1,483 @@
+% D2 source. Figures are editable LaTeX picture diagrams embedded below.
+% Compile with Tectonic or XeLaTeX from this directory.
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{fontspec}
+\IfFileExists{/System/Library/Fonts/Supplemental/Times New Roman.ttf}{%
+\setmainfont{Times New Roman}[Path=/System/Library/Fonts/Supplemental/,Extension=.ttf,UprightFont=*,BoldFont=* Bold,ItalicFont=* Italic,BoldItalicFont=* Bold Italic]
+\setmonofont{Times New Roman}[Path=/System/Library/Fonts/Supplemental/,Extension=.ttf]
+}{\setmainfont{Times New Roman}\setmonofont{Times New Roman}}
+\usepackage{graphicx,booktabs,longtable,array,ragged2e,fancyvrb,caption}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={In-Home Assistive Robot: Design D2},pdfauthor={Gavin Lamphier; Liam Patel; Austin Heiss}}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt plus 1pt}
+\setlength{\emergencystretch}{4em}\setlength{\tabcolsep}{4pt}
+\setlength{\LTpre}{8pt}\setlength{\LTpost}{10pt}
+\renewcommand{\baselinestretch}{1.08}
+\captionsetup{font=small,labelfont=bf,labelsep=period,skip=8pt,hypcap=false}
+\newcommand{\field}[1]{\texttt{#1}}
+\newcommand{\projectgoal}{Our robot lets an older or disabled adult at home take video calls from a family caregiver and, if they want, have the robot follow them from room to room during the call. The robot stops following as soon as it loses track of them or a safety check fails.}
+\newcommand{\boxnode}[5]{\put(#1,#2){\framebox(#3,#4){\parbox{\dimexpr #3pt-8pt\relax}{\centering\small #5}}}}
+\newcommand{\faultnode}[5]{\put(#1,#2){\dashbox{3}(#3,#4){\parbox{\dimexpr #3pt-8pt\relax}{\centering\small #5}}}}
+\newcommand{\diaghead}[1]{{\bfseries In-Home Assistive Robot | #1}\par\smallskip{\footnotesize Goal: \projectgoal\par}\medskip}
+\pagestyle{plain}
+\begin{document}
+\pagenumbering{gobble}
+\begin{titlepage}\centering\vspace*{1.2in}
+{\LARGE\bfseries In-Home Assistive Robot\par}\vspace{0.25in}
+{\Large Detailed System Design\par}\vspace{0.12in}{\large Design D2\par}\vspace{0.8in}
+\begin{tabular}{ll}Gavin Lamphier & Industrial Design\\[6pt]Liam Patel & Mechanical Engineering\\[6pt]Austin Heiss & Computer Science\end{tabular}
+\par\vspace{0.55in}November 11, 2026
+\vfill\begin{minipage}{0.84\textwidth}\textbf{Goal.} \projectgoal\end{minipage}
+\par\vspace{0.16in}{\small AI assisted with drafting and LaTeX formatting.\par}
+\par\vspace{0.16in}{\small Peer feedback recorded; follow-up validation pending.\par}\vspace*{0.6in}
+\end{titlepage}\pagenumbering{arabic}
+
+\section{Header, conventions, and D2 overview}
+\textbf{Goal.} \projectgoal
+
+The system is a compact robot built by the team, a caregiver's iOS companion, and a call-signaling service. The resident accepts each call, chooses whether to follow, and can revoke access locally. D1 detailed the call server's relational model and selected-person tracking. D2 completes the resident controls, call manager, media, motion, physical platform, and caregiver app, adds authentication, notifications, configuration, and logging, and closes the integration boundaries of the two D1 components.
+
+The first complete user journey remains an invited call and a slow, requested transition on one clear indoor floor. D2 defines intended behavior for that journey; it does not certify a working household robot. Broader reminder, delivery, home-control, and help features remain outside this design's requirement baseline.
+
+\textbf{Conventions.} In both figures, solid rectangles are software states or decisions; the labels identify which. Dashed rectangles are failure or revocation outcomes. Arrow labels state the event or guard for a transition; arrows carry control, not physical force. State held during a session is volatile unless a component explicitly names a persistent record. The data model uses PK for primary key, FK for foreign key, and 1 / 0..* for exactly one / zero or more; the D1 entity diagram remains the model for the call database. Each figure repeats its own legend, project title, and goal.
+
+\textbf{Known gaps and open questions.} The team is exploring both a statically supported base with two driven wheels and a rear caster, and a two-wheel balancing base; neither is selected as the final platform. Both use the interfaces below, with different stop responses. Unrestricted household operation is outside the first prototype: moving trials require a supervised, bounded dry-floor area, verified privacy guards and the appropriate physical support. Hardware dimensions, motor/driver parts, stopping measurements, camera/depth integration and hosting costs remain to be confirmed. Until a matching qualification record exists, actuation stays disabled. The permission, expiry, fault and recovery rules are design decisions; their hardware performance is not a completed test result. Clare Hooper's October 26 review and our single outgoing issue are recorded in Section 6, with proposed November 18 follow-up targets.
+
+The newer stationary prototype has delivered generated video/audio in eight same-machine calls. It uses Node, HTTP/SSE, browser WebRTC, and fixture identities; it is not the proposed FastAPI, Keycloak, and SwiftUI deployment, a LAN test, or a physical camera trial. New SAM-mask decoding and freshness work is also offline and cannot authorize motion. Its 200 ms age limit is a development bound; the measured stopping envelope must cover the entire loss-to-braking delay. These experiments guide the adapters below without replacing their missing real-world evidence.
+
+\textbf{Ownership.} Gavin leads resident interaction, screen layout, caregiver workflows, and accessibility evaluation. Liam leads 3D modeling, chassis/mount design, fabrication, assembly, fixtures, power/mechanical integration, and physical movement/stopping tests; Austin implements software, sensing, communication, and control with Liam. This preserves the D0 ownership boundaries.
+
+\section{Finished components, the D2 diagrams}
+
+\subsection*{Shared records and execution rules}
+A \field{UUID} is a canonical UUID string. An \field{ID} is 1--64 ASCII letters, digits, underscores, or hyphens. A \field{uint} is an integer from zero through 9,223,372,036,854,775,807; booleans are not integers at the ingestion boundary. Floats must be finite. \field{ms} means integer milliseconds in one local monotonic clock; UTC is used only for durable display/audit times. Time from a remote computer never replaces the robot's local capture time.
+
+\textbf{Context} is \field{\{boot:UUID, call:UUID|null, epoch:uint, sequence:uint\}}. Call is null only while idle; signaling/media require a nonnull call. Reboot changes boot; End, Privacy, caller revocation, and authority failure invalidate the session epoch. Every asynchronous completion checks current context before publishing or affecting capture. A late completion from an old call neither revives that call nor tears down a newer one.
+
+\textbf{Result} is either \field{\{ok:true, value:T\}} or \field{\{ok:false, code:Code, message:text\}}. Text is 1--160 characters with no credentials or raw media. Codes are INVALID\_\allowbreak{}INPUT, DENIED, STALE, BUSY, UNAVAILABLE, TIMEOUT, FAULT, or UNQUALIFIED. The contracts below assign when they occur. Existing D1 HTTP codes remain unchanged. Live queues are bounded; revocation takes priority over ordinary requests. A separate \field{selection\_\allowbreak{}epoch:uint} changes on target loss, reselection, or FOLLOW revocation; it does not end the call or change its media epoch.
+
+\textbf{AuthoritySnapshot} is \field{\{context:Context, call\_\allowbreak{}state:CallState, media\_\allowbreak{}allowed:bool, follow\_\allowbreak{}allowed:bool, selected\_\allowbreak{}target:ID|null, environment\_\allowbreak{}revision:uint\}}. Both permissions start false. This revision identifies the current EnvironmentState; leases bind to it, so an area-policy change invalidates old work. \textbf{CallLease} adds approved \field{audio:bool}, \field{video:bool}, a local \field{expires\_\allowbreak{}ms:uint}, and \field{environment\_\allowbreak{}revision:uint}; it is valid only for the current accepted call and allowed area revision. The application never treats a transport acknowledgment as resident acceptance or observed capture. TrackingState is {status: unselected/candidate/lost/unavailable, selection\_\allowbreak{}epoch:uint, target:ID|null, reason:Code|null}; capture state is {context:Context, camera:on/off/unknown, microphone:on/off/unknown}.
+
+\begin{center}\begin{minipage}{\linewidth}\centering
+\diaghead{Resident-controlled call lifecycle}
+\setlength{\unitlength}{1pt}
+\begin{picture}(480,390)
+\boxnode{10}{330}{140}{42}{Idle\\No capture lease}
+\boxnode{175}{330}{140}{42}{Invited\\Named caller shown}
+\boxnode{340}{330}{130}{42}{Connecting\\Fresh acceptance}
+\put(150,351){\vector(1,0){25}}\put(150,366){\makebox(25,0){\scriptsize I2}}
+\put(315,351){\vector(1,0){25}}\put(322,379){\makebox(10,0){\scriptsize Accept}}
+\boxnode{340}{225}{130}{45}{Connected\\Confirmed media}
+\put(405,330){\vector(0,-1){60}}\put(411,300){\makebox(0,0)[l]{\scriptsize media ready}}
+\faultnode{10}{225}{140}{45}{Declined / no answer\\No capture starts}
+\put(175,340){\line(-1,0){12}}\put(163,340){\line(0,-1){90}}\put(163,250){\vector(-1,0){13}}
+\put(4,292){\makebox(145,0){\scriptsize Decline / 60 s expiry}}
+\faultnode{175}{130}{140}{55}{End / Privacy / area fault\\Invalidate epoch first}
+\put(340,245){\line(-1,0){95}}\put(245,245){\vector(0,-1){60}}
+\put(175,263){\makebox(140,0){\scriptsize Local End / Privacy}}
+\put(455,330){\line(0,-1){175}}\put(455,155){\vector(-1,0){140}}
+\put(320,201){\makebox(130,0){\scriptsize timeout / transport fault}}
+\boxnode{175}{25}{140}{50}{Cleanup\\Close tracks and peer;\\FOLLOW off}
+\put(245,130){\vector(0,-1){55}}
+\put(80,225){\line(0,-1){175}}\put(80,50){\vector(1,0){95}}
+\put(175,48){\line(-1,0){170}}\put(5,48){\line(0,1){303}}\put(5,351){\vector(1,0){5}}
+\put(10,12){\makebox(150,0){\scriptsize Idle after cleanup; no automatic resume}}
+\end{picture}
+{\footnotesize Legend: solid boxes = call states/actions; dashed boxes = denied or revoked outcomes. Arrows = guarded events. I2 is signaling, not media. Area/Privacy faults revoke media and tracking; a new call requires new acceptance.\par}
+\captionof{figure}{Call lifecycle and error paths}\label{fig:call}
+\end{minipage}\end{center}
+
+\subsection*{Resident controls}
+\textbf{Data.} No persistent data. \field{ResidentView} holds caller name (1--80 characters), CallState, following/stopping/unknown, privacy on/off, and separately observed camera/mic on/off/unknown. An action carries the current Context and an increasing sequence. Camera icons reflect observed capture, not merely the requested gate.
+
+\textbf{Behavior.} Show the named invitation and accessible sound; accept/decline is explicit. Follow requires an accepted call and a selected target. Stop following withdraws FOLLOW without ending the call. End withdraws both scopes; full Privacy also requests all application capture off. Unknown sensor state is shown as unknown. A privacy exit restores no call, media, or following. Buttons must be reachable from a seated position; a separate switch fixture is acceptable if the low screen is not reachable. In response to PR-04, use a small, consistent set of plainly labeled actions, readable high-contrast text, and status conveyed by words as well as color. The resident workflow requires neither a smartphone nor a remembered voice phrase. Gavin will walk through accepting/declining a call, stopping, enabling Privacy, and recognizing capture state with varied text size, reach, hearing, vision, dexterity, and technology familiarity; record task errors and assistance instead of claiming usability for everyone. Physical and participant evaluation remain pending.
+
+\textbf{Interface.} I3 \field{act(context, action, target:ID|null) -> Result<AuthoritySnapshot>}; action is accept, decline, end, follow, stop, or privacy. Target is required only for Follow. Invalid or old context returns STALE; Follow without acceptance/selection returns DENIED. I15 renders \field{ResidentView}; unsupported action returns INVALID\_\allowbreak{}INPUT. I4 is a supervised wired input bundle: asserted/open Stop withdraws movement; asserted/open Privacy withdraws all RGB/microphone capture and movement. Guard and operator-enable inputs have the separate scope defined below. Contact debounce must never delay assertion; release alone cannot rearm. Physical wiring is unqualified. Handler/owner: resident controls, Gavin; safety input implementation, Liam/Austin.
+
+\subsection*{Call manager and local authority}
+\textbf{Data.} No persistent permission grants. State is Idle, Invited, Connecting, Connected, or Closing, plus the current Context, CallLease, selected target, and a separate FOLLOW grant. Retain the existing consent/bridge rules as the behavioral reference; do not build a second writable consent authority.
+
+\textbf{Behavior.} Validate an authenticated, paired invitation; arbitrate one active call. Accept grants only that call's requested media. Commit a revocation/epoch change before initiating cleanup, then revoke media, delegated tracking capture and motion at their owners. End/session revocation also drops the shared capture-enable latch; only tracking loss can leave the media lease intact. End, full Privacy, caller revocation, session loss, or expiry invalidate pending work. A watchdog expires leases even if no new callback arrives. Admission also requires a current allowed EnvironmentState. An excluded or unknown operating area revokes FOLLOW, the media lease and tracking capture; cleanup follows the same epoch-first Privacy path. An operator-enable release stops movement alone when the area and privacy guards remain valid. No caregiver override bypasses that boundary (PR-02/03). Keep an active call for ordinary tracking loss, Stop following or an operator-enable release when media permission remains valid; end it when the signaling session itself is lost, matching D0 I2. Call setup has a two-second acceptance-to-visible-connection target, measured across the full path, not just a server timer (Figure~\ref{fig:call}).
+
+\textbf{Interface.} I5 \field{setMedia(lease:CallLease|null) -> Result<MediaState>}; I6 \field{setFollow(context, selection\_\allowbreak{}epoch:uint, enabled:bool) -> Result<MotionState>}; I8 \field{select(context, selection\_\allowbreak{}epoch:uint, target:ID|null, enabled:bool) -> Result<TrackingState>}. Null/false revokes. Old context returns STALE; competing invitation BUSY; absent authority UNAVAILABLE. An unresponsive service cannot block permission revocation. Austin owns this component.
+
+\textbf{Operating-area admission within the local authority.} EnvironmentPolicy is a persistent, versioned local record: \field{\{revision:ID, area:ID, barriers:ID, view\_\allowbreak{}check:ID, permit\_\allowbreak{}ms:uint[1..300000]\}}. The default permit is 300,000 ms for one supervised trial. Barrier/view IDs refer to a documented route and camera-view check for the current geometry, not an inferred room label. The checked route has closed physical barriers to bathrooms, wet areas and stairs; an opaque screen or closed door excludes bathroom views over the full permitted route, camera field of view and turns. Without those physical conditions, no area is approved. Final room recognition or autonomous geofencing is not assumed.
+
+EnvironmentState is volatile: \field{\{boot:UUID, policy:ID, area:ID|null, revision:uint, status:allowed/\allowbreak{}excluded/\allowbreak{}unknown, expires\_\allowbreak{}ms:uint, guard:closed/\allowbreak{}open/\allowbreak{}fault, operator\_\allowbreak{}enable:bool\}}. It starts unknown on boot, relocation or configuration change. A local operator inspects the dry route, barriers, full camera view and support fixture, then explicitly arms the trial on the robot's commissioning panel. This physical operator action is separate from a network maintainer/caregiver role. A supervised, normally closed guard circuit reports barrier/privacy-guard state; a separate hold-to-enable input is required for movement. Neither is a caregiver command. Initial moving trials therefore require an operator; unattended household use is not claimed.
+
+\textbf{Admission steps.} (1) Reject an old boot/policy, incomplete check or unqualified profile. (2) With the guard closed, store a new revision and local expiry; publish allowed. (3) Each control tick requires that revision, an unexpired permit and current guard state; movement also requires operator enable. (4) At \field{now>=expires}, a guard opening/fault or relocation, increment the environment revision and call epoch before asynchronous cleanup, revoke all RGB/microphone/tracking leases and request a latched stop. The wired guard also drops the capture-enable latch independently of application queues. Depth/encoder inputs needed for stopping are separate. (5) Closing a guard or returning power cannot rearm: a fresh local area check, new call acceptance and explicit Follow/selection are required as applicable.
+
+\textbf{Local contract.} \field{armArea(policy:ID, area:ID, checks:AreaChecks, expected\_\allowbreak{}boot:UUID) -> Result<EnvironmentState>}; AreaChecks has dry\_\allowbreak{}route, barriers\_\allowbreak{}closed, full\_\allowbreak{}view\_\allowbreak{}screened and support\_\allowbreak{}ready, all booleans that must be true and match the manifest/physical inputs. False checks give DENIED; wrong boot/revision STALE; absent guard UNAVAILABLE; missing qualification UNQUALIFIED. Only the local commissioning panel may call it. \field{invalidateArea(reason)} is idempotent, returns the new EnvironmentState, and accepts guard\_\allowbreak{}open, guard\_\allowbreak{}fault, moved, expired, privacy or config\_\allowbreak{}changed; unknown reason gives INVALID\_\allowbreak{}INPUT. The authority reads a fresh state directly each tick; remote messages cannot publish allowed. Austin owns this logic; Liam owns the guard/support fixtures; Gavin owns the local check and status wording.
+
+\subsection*{Audio/video calling}
+\textbf{Data.} No persistent media. One volatile peer connection, accepted lease, bounded SDP/ICE queues, and capture-state observations. MediaState is off, connecting, connected, closing, failed, or unknown. Device buffers are never written as a call recording.
+
+\textbf{Behavior.} Open devices only after lease admission. Check context before attaching tracks and on every asynchronous completion. On revoke, detach/stop outgoing tracks, close the peer, clear queued signaling and volatile media buffers, then release its platform capture lease; a failed physical close reports unknown, never camera-off by assumption. A provisional two-second negotiation deadline produces FAILED, not an invented connection. No automatic redial or ICE restart. A new call starts a fresh peer/lease. Physical device privacy still requires fixture verification. PR-03 excludes bathroom camera use, including a view through an open doorway: approved placement must keep the bathroom out of view, not merely keep the wheels outside. No ambient bathroom audio monitoring is added. Full Privacy also cancels tracking, clears its image/mask buffers and drops the platform capture-enable latch; ending media alone must not leave the tracking camera open. If the allowed area or capture state is uncertain, deny capture, show unknown where appropriate, and require local recovery; an off icon is not evidence of device shutdown.
+
+\textbf{Interface.} I10 \field{capture(lease) -> Result<CaptureState>} and \field{close(context) -> Result<CaptureState>}; failures are DENIED, STALE, UNAVAILABLE, or FAULT. I12 uses encrypted WebRTC media with a configured direct/relay route [1]. Signaling is \field{WSS /v2/calls/\{call\}/signal}, authenticated as a participant. Each frame has Context, \field{type} offer/answer/ice/close, and \field{body}. SDP is text at most 65,536 UTF-8 bytes; ICE is \field{\{candidate:text, mid:text|null, mline:uint|null\}} at most 4,096 bytes. Limit 128 pending candidates; drain only after the matching remote description. Overflow/invalid messages close 1008, internal failure 1011, timeout ends the attempt. Never log SDP, ICE addresses, or tokens. The adapter is new; the local fixture's loopback ICE rewriting must not be used on a LAN. Austin owns media.
+
+\begin{center}\begin{minipage}{\linewidth}\centering
+\diaghead{Following admission and failure handling}
+\setlength{\unitlength}{1pt}
+\begin{picture}(480,435)
+\boxnode{10}{365}{220}{45}{Decision: allowed area + operator enable,\\accepted call + FOLLOW + selection?}
+\boxnode{10}{265}{220}{55}{Decision: fresh RobotTargetV2,\\measured calibration, identity/\\mask ownership and correct context?}
+\boxnode{10}{155}{220}{55}{Decision: path clear + selected profile,\\controller and support fixture ready?}
+\boxnode{10}{55}{220}{45}{Issue expiring high-level target\\Qualified speed; first cap 0.05 m/s}
+\put(120,365){\vector(0,-1){45}}\put(127,343){\makebox(0,0)[l]{\scriptsize yes}}
+\put(120,265){\vector(0,-1){55}}\put(127,242){\makebox(0,0)[l]{\scriptsize yes}}
+\put(120,155){\vector(0,-1){55}}\put(127,132){\makebox(0,0)[l]{\scriptsize yes}}
+\faultnode{285}{265}{185}{65}{No / stale / fault / Stop\\Latch disarm; reject target\\Area fault also revokes capture}
+\put(230,387){\line(1,0){148}}\put(378,387){\vector(0,-1){57}}\put(255,399){\makebox(50,0){\scriptsize no}}
+\put(230,290){\vector(1,0){55}}\put(247,306){\makebox(20,0){\scriptsize no}}
+\put(230,180){\line(1,0){30}}\put(260,180){\line(0,1){112}}\put(260,292){\vector(1,0){25}}
+\put(232,195){\makebox(25,0){\scriptsize no}}
+\faultnode{285}{145}{185}{65}{Caster: brake and observe\\Balancing: stabilize at zero travel\\Critical fault: supported isolation}
+\put(378,265){\vector(0,-1){55}}
+\boxnode{285}{35}{185}{65}{Rearm after verified conditions,\\fresh local/resident actions.\\No automatic resume.}
+\put(378,145){\vector(0,-1){45}}
+\put(230,75){\line(1,0){30}}\put(260,75){\line(0,1){200}}\put(260,275){\vector(1,0){25}}
+\put(266,90){\rotatebox{90}{\scriptsize expiry / fault}}
+\put(0,12){\makebox(480,0){\scriptsize Each tick rechecks expiry, local Stop/Privacy and platform feedback; excluded/unknown area revokes access; no remote override.}}
+\end{picture}
+{\footnotesize Legend: solid boxes = decisions/actions; dashed boxes = failure states. Arrows = guarded control transitions. A tracking-only stop can retain the call. A zero travel request is not a validated physical stop; the profile selects the fault response.\par}
+\captionof{figure}{Movement guards, watchdogs, and error paths}\label{fig:motion}
+\end{minipage}\end{center}
+
+\subsection*{Person tracking: D1 completion and adapter boundary}
+\textbf{Data.} No persistent images or target identities. Keep a bounded capture ledger (128 entries), boot/selection epoch, original acquisition times, selected instance, calibration revision, and decoded masks in memory. D1's optical-Z TrackRecord remains an offline inspection type with \field{motion\_\allowbreak{}authorized=false}.
+
+\textbf{Behavior.} The desired SAM path is an optional mask provider, not a motion authority. Bind every reply to exact provider/version, request, capture, and selection. Enforce resource limits before mask decoding; accept only verified full-frame placement, not guessed resize/rotation. Reject unknown/duplicate frames, expired/old selections, empty or ambiguous masks, missing calibrated depth, and late completions. An empty provider result means no observation. SAM object IDs are not cross-request personal identity [2]. Current provider probes and normalized-mask adapters do not establish live tracking.
+
+\textbf{Interface.} I9 supplies sensor observations; the private mask adapter exposes \field{admit(capture, selection, decodedMask) -> Result<OfflineCandidate>}. Its output cannot issue movement commands. I7 gains a separate \field{RobotTargetV2}: \field{\{context:Context, selection\_\allowbreak{}epoch:uint, frame:uint, target:ID, capture\_\allowbreak{}ms:uint, expires\_\allowbreak{}ms:uint, forward\_\allowbreak{}m:float, right\_\allowbreak{}m:float, uncertainty\_\allowbreak{}m:float, calibration:ID\}}. Distances are in the robot's calibrated level-ground frame, forward/right positive, uncertainty nonnegative. A rigid camera-to-base transform plus measured support/pose is required; radial ToF distance or D1 optical Z cannot be renamed forward distance. There is currently no qualified producer of this type: emit UNQUALIFIED, not fabricated coordinates. Loss invalidates the target and requires explicit reselection. Austin owns tracking; Liam supplies measured sensor mounting/pose data.
+
+\subsection*{Motion control}
+\textbf{Data.} No persistent motion commands. MotionState is disarmed, following, stop\_\allowbreak{}requested, settled, fault or unknown. Keep the target lease, local sequence, environment revision, stop anchor and fresh platform feedback in memory. A persistent StopEnvelope belongs to a measured geometry/profile revision: maximum allowed speed, worst loss-to-braking delay, measured braking-distance bound as a function of speed, feedback-error margin and evidence ID. Missing evidence keeps the motion feature disabled.
+
+\textbf{Following algorithm.} Figure~\ref{fig:motion} is the admission flow. (1) Require the current accepted call, resident FOLLOW/selection, allowed area, held operator enable, fresh calibrated RobotTargetV2, independent clearance and a qualified platform profile. (2) In the robot frame compute distance \field{sqrt(forward*forward+right*right)} in metres and right-positive heading \field{atan2(right,forward)}. Use a 0.9 m approach setpoint; request \field{min(speed\_\allowbreak{}cap,max(0,0.4*(distance-0.9)))} m/s. Admit tracking only with uncertainty at most 0.05 m; when distance plus its uncertainty is at most 1.0 m, latch an arrival stop with both travel and turn zero. This gives a finite arrival threshold inside the one-metre requirement rather than asymptotically approaching it. Before arrival, suppress forward travel when heading error exceeds 30 degrees. Request heading correction of one degree/s per degree of error, limited to -30..30 degrees/s. These gains are initial test values. (3) Clamp valid computed requests to the qualified envelope; reject malformed/nonfinite external inputs. Publish only the newest DriveCommand with expiry \field{min(target.expires\_\allowbreak{}ms,now+100)}; reusing an old target cannot extend its acquisition deadline. Each tick repeats admission; a lost target latches stop and requires explicit reselection. Arrival retains the call; another movement needs a new resident Follow action.
+
+The absolute speed limit remains 0.2 m/s. The initial candidate cap is 0.05 m/s and can be enabled only after the envelope verifies \field{v*t\_\allowbreak{}loss+d\_\allowbreak{}brake(v)+margin<=0.025} metres. Here t\_\allowbreak{}loss includes sensor age, loss detection, scheduling, transport, clock uncertainty and command expiry, not just the controller period. This resolves the conflict between a 200 ms observation-age allowance and a 25 mm stopping target at higher speed. Record peak excursion and the final stop separately. Reject the motion profile if no measured speed satisfies the bound. No stopping distance is claimed from the formula alone.
+
+\textbf{Stop and fault steps.} Stop following, target loss, operator-enable release or command expiry first latches disarm and prevents fresh travel commands. In the caster profile, command zero wheel speed and the driver's documented brake mode; once settled, retain the brake/hold state. In the balancing profile, request zero travel/turn while the local balance controller remains active; a normal Stop never blindly cuts its balancing torque. The balancing exploration is permitted only in a passive support fixture that arrests a fall/runaway; free-floor balancing remains disabled. Both branches use a bounded test area and physical restraint for power/driver/feedback fault-injection tests. On a critical feedback/controller/driver fault, the independent safety path disables drive, the fixture provides physical containment, and motion is fault/unknown until inspected. For the caster candidate, unpowered rolling/holding must also be measured; dynamic braking is not assumed to work without power. Neither profile is released for unrestricted movement without a verified physical fault response.
+
+Report settled only from fresh calibrated feedback: final displacement at most 25 mm from the loss anchor and speed below 5 mm/s for a full second within 10 seconds. If it does not settle by then, or feedback disappears, latch fault/unknown; do not report a software stop request as physical success. Ordinary tracking/Follow stops can retain the call; area/Privacy faults revoke all capture. Rearm requires inspected healthy conditions, a fresh local enable and explicit resident Follow/selection; fault reset alone never starts movement.
+
+\textbf{Interface.} I11 \field{command(request:DriveCommand) -> Result<MotionObservation>}. DriveCommand is \field{\{context:Context, selection\_\allowbreak{}epoch:uint, sequence:uint, environment\_\allowbreak{}revision:uint, v\_\allowbreak{}m\_\allowbreak{}s:float, turn\_\allowbreak{}deg\_\allowbreak{}s:float, expires\_\allowbreak{}ms:uint\}}; v is 0--the qualified cap (never over 0.2), turn is -30..30 degrees/s and the host deadline is at most 100 ms ahead. I6 returns MotionState; I7 consumes RobotTargetV2. Add \field{stop(context, reason) -> Result<MotionObservation>} with reason resident, target\_\allowbreak{}lost, expired, area, feedback or power; it is idempotent and never grants motion. Invalid input gives INVALID\_\allowbreak{}INPUT; old boot/epoch/revision/sequence or expired request STALE; closed permission DENIED; missing envelope/profile UNQUALIFIED; device/feedback failure FAULT. Liam owns movement/fixture testing; Austin owns the supervisor and adapters.
+
+\subsection*{Robot platform}
+\textbf{Data.} PlatformManifest is persistent: revision:ID, geometry:ID, profile:caster/balancing, controller:ID, calibration:ID, wheel\_\allowbreak{}radius\_\allowbreak{}m:float, track\_\allowbreak{}width\_\allowbreak{}m:float, driver:ID, stop\_\allowbreak{}envelope:ID|null and qualified:bool (default false). Radius/width must be finite and positive. The caster candidate has two driven wheels and a rear caster; the balancing candidate has two driven wheels and a local stabilizer. A profile change invalidates the manifest, stop envelope and area approval; simulation success for one never qualifies the other.
+
+MotionObservation is volatile: Context, controller\_\allowbreak{}boot:UUID, sequence:uint, sample\_\allowbreak{}ms:uint, speed\_\allowbreak{}m\_\allowbreak{}s:float, turn\_\allowbreak{}deg\_\allowbreak{}s:float, state:MotionState, path\_\allowbreak{}clear:bool|null, support\_\allowbreak{}ready:bool|null, guard:closed/\allowbreak{}open/\allowbreak{}fault and fault:Code|null. Null means unknown, never clear/ready. No motion command survives reboot. SensorObservation has frame:uint, capture\_\allowbreak{}ms:uint, rgb\_\allowbreak{}handle:ID|null, depth\_\allowbreak{}handle:ID|null, rgb\_\allowbreak{}ms:uint|null, depth\_\allowbreak{}ms:uint|null, depth\_\allowbreak{}status:available/unavailable, calibration:ID and driver\_\allowbreak{}status:available/fault. Capture\_\allowbreak{}ms is the oldest acquisition time in the matched pair. An unavailable buffer has a null handle/time; an uncalibrated or unsynchronized pair cannot produce a target. RGB/depth handles refer to bounded process-local buffers using the D1 image/point limits and units; the calibrated depth record carries the D1 optical-depth points and their bounds. Handles belong to the current boot/frame and expire with that capture. RGB access requires the current media or delegated tracking lease; full Privacy invalidates those handles and clears their buffers. Independent depth data used only by the stop controller remains available under its separate local safety scope. CaptureState reports camera/microphone on/off/unknown separately.
+
+\textbf{Controller behavior.} The proposed common boundary is a dedicated local controller over USB serial, not a network motor endpoint. The caster adapter uses right-positive turn: with omega in radians/s and track width b, left/right linear wheel setpoints are v+omega*b/2 and v-omega*b/2; divide by wheel radius for rad/s and apply the measured motor polarity; a local PI feedback loop regulates each wheel with bounded output, anti-windup and integral reset when disarmed. Gains/output limits are calibration data tied to the manifest and require bench tuning. The balancing adapter passes body travel/turn requests to its experimental local stabilizer and requires current IMU/wheel feedback plus the engaged support fixture. Its stabilization policy/gains remain an experimental asset, not evidence of floor readiness. The controller runs a provisional 10 ms supervisory tick, reports feedback every 20 ms and enters the profile's stop response on a 100 ms command expiry; feedback older than 60 ms is a fault. All periods require load testing. Local Stop/guard contacts and an independent watchdog override queued commands. On critical watchdog/feedback failure drive is isolated in the supported test configuration; after power loss there is no claim of fresh telemetry or a confirmed stop.
+
+\textbf{Hardware and capture behavior.} Liam owns 3D modeling, chassis/mounts, fabrication, mass/stability, wiring strain relief, guards and support fixtures for both candidates. Keep bathrooms outside both the route and camera view. Gavin/Liam compare full-scale visibility/reach mockups, protrusions, approach clearance and parking outside walking routes/doorways. The bare depth component still needs carrier, power/firmware, host, RGB camera and measured calibration. One platform capture owner brokers RGB/microphone access for media and tracking; consumers cannot open a second independent camera. The normally-off capture-enable latch drops on End/session revocation, full Privacy, area-guard fault, authority failure or power loss, irrespective of pending callbacks. Driver closure and gate feedback must both confirm off; otherwise show unknown. Clear volatile image/audio/mask buffers on revoke. Stop-related depth/encoder inputs stay separate, so removing call capture does not remove required stopping feedback. Releasing a contact cannot restart capture.
+
+\textbf{Interfaces.} I9 \field{readSensors() -> Result<SensorObservation>}; I10 \field{capture(lease:CallLease) -> Result<CaptureState>} and \field{close(context) -> Result<CaptureState>}; I11 takes DriveCommand/stop above. No lease gives DENIED; missing device UNAVAILABLE; invalid schema INVALID\_\allowbreak{}INPUT; wrong calibration/profile UNQUALIFIED; driver or capture-gate failure FAULT. The wired I4 status adds guard and operator-enable inputs beside Stop/Privacy; open/fault is restrictive. I9 also provides \field{resolveBuffer(handle:ID, context:Context) -> Result<FrameBuffer>}: RGB is uint8[height,width,3] with each dimension <=1920 and at most 2,073,600 pixels; depth is the D1 bounded optical-depth point record, not raw radial range. Missing/expired handles give STALE, absent permission DENIED and unqualified projection/calibration UNQUALIFIED. Buffers stay in the host adapter; they are not motor-channel payloads. The controller channel is bounded, line-delimited UTF-8 JSON (maximum 4,096 bytes/frame) with type command/stop/status/sync, controller boot, increasing sequence and the typed fields above. A sync reply echoes sequence plus sample\_\allowbreak{}ms:uint and controller\_\allowbreak{}boot:UUID; H1/H2 are measured only by the host. Channel replies use Result; invalid frame INVALID\_\allowbreak{}INPUT, old identity/sequence STALE and closed movement permission DENIED. Reject bad JSON, duplicate keys, nonfinite numbers and unknown fields; drop malformed frames without extending the current command lease. Duplicate commands may return their earlier receipt but never renew expiry. A stop contact does not wait for this channel.
+
+\textbf{Clock and recovery rule.} The adapter obtains a controller timestamp C between host send H1 and receive H2, giving a signed millisecond offset interval [C-H2,C-H1]; reject a round trip over 10 ms or a mapping over one second old. Translate a host deadline with the lower offset bound minus the measured drift margin, so transport delay cannot create a later deadline. Include controller boot, reject an expired translated deadline and never re-stamp an old command on arrival. Missing/uncalibrated mapping gives UNQUALIFIED and disarms. Link failure gives UNAVAILABLE followed by local expiry; reboot disarms and requires a new mapping/area check. A repaired link only reports status; it cannot replay queued movement.
+
+\subsection*{Call server: D1 completion}
+\textbf{Data.} Retain D1's Robot, Caregiver, Pairing, and CallAttempt entities and indexes. CallAttempt is durable metadata only; the proposed retention is 30 days, subject to the team's privacy decision. Live socket membership and signaling queues are volatile. New accepted-call participant/epoch bindings are session data, not a second consent database.
+
+\textbf{Behavior.} D1's transaction and terminal-state rules still apply. The server transports invitations/outcomes and authorized signaling, but the robot owns acceptance and capture leases. A robot heartbeat arrives each second; five seconds without one produces offline with last-seen UTC. A restart fails active attempts, resets session baselines, and never redials. Signaling callbacks from old contexts are rejected even if their delivery finishes late. The Node stationary prototype is the current executable bench; the proposed FastAPI product adapter must reproduce its accepted golden traces before replacement. Never run two writable call authorities.
+
+\textbf{Interface.} D1 I1/I2 endpoints remain version 1. The v2 signaling endpoint above is an additive, separate contract; participation requires authenticated call membership. Before signaling, the enrolled robot calls POST /v2/calls/{call}/binding with JSON {action:bind/revoke, context:Context}; only it may bind the current accepted context. The server keeps this membership in memory. HTTP 200 returns {context:Context, active:bool}; exact repeats are idempotent, malformed input gives 400, invalid token 401, wrong role/pairing 403, unknown call 404, conflicting context 409, and identity/storage failure 503. Revocation or socket loss removes the binding; stale revocation cannot remove a newer context. This binding transports the robot authority decision and cannot itself enable capture. Relay unavailability produces failed call, not insecure transport. Database/identity unavailability returns 503, duplicate start handling follows D1, and a terminal attempt cannot return connected. Austin owns the server.
+
+\subsection*{Caregiver iOS app}
+\textbf{Data.} No persistent media or health observations. Cache account/robot IDs and last known call status with age; stale status is explicitly labeled. An optional refresh credential uses the iOS Keychain and is cleared on sign-out. Access tokens stay in memory and are excluded from application logs. The call database still stores no tokens.
+
+\textbf{Behavior.} Foreground sign-in, paired-robot selection, Call, End, and call-result display form the first iOS workflow. Disable duplicate taps while a request is pending; use one request ID for transport retries of that attempt. Resident acceptance still gates media. Reconnection reads the old outcome and never redials. If the app backgrounds or its foreground session disconnects before background calling is implemented, end the attempt/call rather than imply continued service. Declined/no answer/offline/failed are communication outcomes, not health conclusions. Background incoming-call notifications are not part of the initial companion.
+
+\textbf{Interface.} I16 \field{call(robot:ID) -> Result<CallStatus>} and \field{end(call:UUID) -> Result<CallStatus>} use I1, with D1 error mappings. I13 uses native authorization-code/PKCE sign-in [3]; I12 uses the same WebRTC/session contract as the robot. Invalid token requires sign-in, 409 refreshes status without a new request, and network/503 errors allow an explicit retry using the same ID. Unknown outcome is shown as unknown, not connected. Use scalable text, VoiceOver labels, and explicit connection/privacy state in the caregiver workflow; validate these separately from resident reach and controls (PR-04). Gavin owns workflow/accessibility, Austin SwiftUI and networking.
+
+\subsection*{Authentication and pairing}
+\textbf{Data.} The proposed identity provider owns its account credentials; the call database stores only caregiver subject ID and Pairing.active. Client secrets/device credentials live outside the repository in protected deployment/OS stores. No resident CALL/FOLLOW grant is stored as a caregiver role.
+
+\textbf{Behavior.} Use the system authentication session with PKCE and an allowlisted redirect, rather than embedded password collection [3]. The server verifies issuer, intended audience, expiry, subject, and active pairing through the identity adapter [4]. Robot credentials bind a specific robot ID. Sign-out/revocation terminates affected sessions; an account regrant cannot restore resident consent. Recheck authorization at admission and invalidate existing sessions when revocation is learned; provider notification/detection latency is a deployment test, not an instantaneous guarantee.
+
+\textbf{Interface.} I13 \field{signIn() -> Result<AccountSession>}; session contains subject:ID, access\_\allowbreak{}token:text (1--4096 characters), and expires\_\allowbreak{}utc:RFC3339 timestamp. I14 \field{verify(token, robot:ID) -> Result<Principal>}; Principal is subject ID plus caller, robot, or maintainer role and permitted robot IDs. Maintainer grants metadata-read only, never media or movement. Invalid/expired token maps 401, inactive pairing 403, and provider failure 503. No fallback to trusted fixture role labels in the deployed profile. Austin owns authentication; Keycloak/Authlib remain proposed integrations.
+
+\subsection*{Notifications and visible status}
+\textbf{Data.} No persistent queue or scheduled call. One active invitation UUID, deadline, announcement state, and confirmed outcome in memory; call outcomes remain in CallAttempt.
+
+\textbf{Behavior.} Announce the named incoming call locally with sound and accessible text within the two-second target. Repeat a provisional sound at most three times, no more than once a second, while the invitation is current; expiry at 60 seconds cancels it. End/decline/privacy cancels future announcements and any callback already queued must recheck context. Caregiver status is pushed only while its foreground authenticated session is current; a missing sound or unavailable screen is surfaced, not treated as acknowledgment.
+
+\textbf{Interface.} \field{announce(context, caller:text, deadline\_\allowbreak{}ms:uint) -> Result<AnnouncementState>}; caller is 1--80 characters; state is shown/sounded/canceled/failed/unknown. \field{cancel(context) -> Result<AnnouncementState>} is idempotent and returns canceled for a current/already canceled announcement; an old context returns STALE without affecting a newer one. Late invitation gives STALE, unavailable output UNAVAILABLE, bad name INVALID\_\allowbreak{}INPUT. Local handler is resident controls/call manager; Gavin owns wording, Austin delivery. This glue serves US-02/03 rather than adding reminder or emergency scope.
+
+\subsection*{Configuration and deployment profile}
+\textbf{Data.} Persistent versioned JSON contains revision:ID, endpoint allowlists, calibration/PlatformManifest IDs, drive profile, finite speed/turn caps, age/lease limits, retention and profile:fixture/deployed. The hard caps remain 0.2 m/s and 30 degrees/s; the qualified initial motion cap is at most 0.05 m/s. Motion\_\allowbreak{}enabled defaults false. EnvironmentPolicy and the StopEnvelope are explicitly version-bound records defined above, not permissive booleans. Credentials are referenced outside the file; no personal data is required. Fixture means synthetic/local test data; deployed means authenticated real-device integration and still requires supervised area approval for the initial prototype.
+
+\textbf{Behavior.} Validate schema, finite values, units, caps, revisions and required credentials on boot. Any missing qualification, stop envelope, capture gate or area guard disables its dependent feature. Apply a safety-related revision only while disarmed with media/tracking capture closed; increment the area revision and invalidate permissions. Do not retain allowed across reboot, relocation or profile changes. Fixture identities/loopback ICE cannot become deployed credentials/routes. No remote model output or caregiver action changes safety configuration. The proposed seven-day diagnostics and 30-day call metadata are defaults to confirm before deployment, not medical-retention rules.
+
+\textbf{Interface.} \field{loadConfig(bytes<=65536) -> Result<Config>} and \field{apply(config, expectedRevision:ID) -> Result<ID>}. Bad/unknown schema gives INVALID\_\allowbreak{}INPUT, active movement/capture BUSY, revision mismatch STALE, missing profile/calibration/qualification UNQUALIFIED, storage/secret loss UNAVAILABLE. Retain the previous revision for inspection; an invalid current revision cannot start the feature. Austin owns software configuration; Liam approves physical profile/calibration revisions.
+
+\subsection*{Logging and diagnostics}
+\textbf{Data.} Persistent metadata Event has event UUID (PK), component enum, Context, UTC/local time, event code (admitted/revoked/unavailable/fault/dropped), outcome:ID, and recoverable:bool. Index context plus time for replay. Do not log raw frames, audio, SDP/ICE addresses, tokens, names, or message contents. Provisional retention is seven days with four 5 MB rotated files; CallAttempt's separate 30-day proposal is not a media archive.
+
+\textbf{Behavior.} A nonblocking queue of at most 256 entries drains to bounded storage. On overflow/full disk, drop ordinary diagnostic entries and increment a visible lost-log counter; permission revocation and local stopping never wait on disk. A failed CallAttempt transaction is different: the server returns 503 rather than inventing durable success. Local fault state remains visible in memory even if its diagnostic record cannot be stored.
+
+\textbf{Interface.} \field{record(event) -> Result<Receipt>} where Receipt is queued/dropped and an optional event UUID. Invalid event gives INVALID\_\allowbreak{}INPUT; storage loss returns UNAVAILABLE with counter. \field{read(context, limit:uint[1..200]) -> Result<EventBatch>} returns \field{\{events:Event[], lost:uint\}} to authenticated metadata maintainers only; return the newest records ordered by time/event UUID, with at most limit entries. Bad limits give INVALID\_\allowbreak{}INPUT, denied access DENIED and storage failure UNAVAILABLE. Austin owns logging; this glue supports US-03 and testable timing/error evidence.
+
+\subsection*{D0 interface audit and revisions}
+The connection IDs remain stable so D0 can be read beside this design. Context is an immutable record rather than repeating many identity/time arguments. Capture buffers, provider credentials, raw masks, and motor internals stay behind their owners. No published D0/D1 source was overwritten.
+
+\begingroup\small
+\begin{longtable}{@{}>{\RaggedRight\arraybackslash}p{0.07\linewidth}>{\RaggedRight\arraybackslash}p{0.25\linewidth}>{\RaggedRight\arraybackslash}p{0.62\linewidth}@{}}
+\caption{D0 interface audit}\\
+\toprule\textbf{ID} & \textbf{Boundary} & \textbf{D2 decision}\\\midrule\endfirsthead
+\toprule\textbf{ID} & \textbf{Boundary} & \textbf{D2 decision}\\\midrule\endhead
+\midrule\endfoot\bottomrule\endlastfoot
+I1 & Caregiver app / call server & Keep D1 v1 request/outcome contract; tokens in Authorization header, not JSON body. Status is not media or resident consent. \\ \addlinespace[3pt]
+I2 & Call server / call manager & Keep D1 invitation/event messages; scope heartbeat sequence to a fresh authenticated session. Add v2 Context only on the separate signaling channel, never silently change v1. \\ \addlinespace[3pt]
+I3 & Resident controls / call manager & act(Context, action, optional target) returns a snapshot or typed error. Context removes repeated boot/call/epoch parameters. \\ \addlinespace[3pt]
+I4 & Controls / motion & Direct Stop/Privacy, guard and operator-enable contacts override queues. Open/fault revokes the relevant scope; returning closed never rearms. Physical circuit/fixture tests remain required. \\ \addlinespace[3pt]
+I5 & Call manager / media & CallLease/null binds current Context, environment revision and capture scopes. Full Privacy revokes the shared platform capture owner, including tracking. Return actual off/unknown state. \\ \addlinespace[3pt]
+I6 & Call manager / motion & FOLLOW remains separate from CALL, with current area revision and operator enable required. stop is idempotent; status distinguishes requested, settled, fault and unknown. \\ \addlinespace[3pt]
+I7 & Tracking / motion & Keep D1 optical-Z output offline. RobotTargetV2 has calibrated forward/right coordinates, uncertainty, Context and expiry; v1 values are never reinterpreted. \\ \addlinespace[3pt]
+I8 & Call manager / tracking & Bind explicit target selection to Context and epoch. Reselection after loss is a new action, not automatic acquisition. \\ \addlinespace[3pt]
+I9 & Platform / tracking & Expose bounded sensor records and local acquisition timestamps/calibration IDs; hardware carrier details remain private to the adapter. \\ \addlinespace[3pt]
+I10 & Platform / media & Use lease-bound device buffers and separate requested/observed camera/mic state. No capture before admission; unknown is not off. \\ \addlinespace[3pt]
+I11 & Motion / platform & One typed DriveCommand replaces repeated arguments. Local USB serial carries bounded JSON; conservative clock translation, expiry and the selected caster/balancing response prevent stale travel. \\ \addlinespace[3pt]
+I12 & Media / caregiver app & WebRTC media remains separate from authenticated v2 SDP/ICE signaling. Direct/relay configuration is explicit; failed connectivity never selects insecure fallback. \\ \addlinespace[3pt]
+I13 & Caregiver app / identity & Native system-session PKCE flow, not raw credentials sent to the team server. App secrets are not embedded in a public native client. \\ \addlinespace[3pt]
+I14 & Call server / identity & verify(token, robot) returns a scoped Principal or 401/403/503 mapping. An identity role never grants resident media/movement consent. \\ \addlinespace[3pt]
+I15 & Resident / controls & Accessible actions and named-caller/capture/following feedback. Stop/Privacy must remain reachable when the main screen cannot be reached. \\ \addlinespace[3pt]
+I16 & Caregiver / iOS app & Foreground Call/End and explicit stale/outcome display; background incoming calls and remote driving remain outside the initial flow. \\ \addlinespace[3pt]
+\end{longtable}\endgroup
+
+I1/I2 errors remain the D1 contract. New local records and the signaling/target v2 contracts are explicit design refinements, not a claim that the current Node bench already implements them. D0 and D1 remain frozen comparison artifacts; rationale entries R1--R10 record the changes here.
+
+\section{Edge cases and error handling}
+Each component has one row for each required category. E49--E52 add the received peer-review concerns; E53--E56 close permit, race, schema and dependency failures without renumbering the earlier cases. Recoverable means a later explicit action or repaired dependency may allow a new attempt; it never permits automatic media or movement resume. No row labels a failed physical stop as recoverable by software alone. Figures~\ref{fig:call} and~\ref{fig:motion} show the corresponding call and movement error paths.
+
+\begingroup\small
+\begin{longtable}{@{}>{\RaggedRight\arraybackslash}p{0.065\linewidth}>{\RaggedRight\arraybackslash}p{0.15\linewidth}>{\RaggedRight\arraybackslash}p{0.14\linewidth}>{\RaggedRight\arraybackslash}p{0.22\linewidth}>{\RaggedRight\arraybackslash}p{0.355\linewidth}@{}}
+\caption{Component edge cases and decided handling}\\
+\toprule\textbf{ID} & \textbf{Component} & \textbf{Category} & \textbf{Edge case} & \textbf{Design decision, handler, recovery}\\\midrule\endfirsthead
+\toprule\textbf{ID} & \textbf{Component} & \textbf{Category} & \textbf{Edge case} & \textbf{Design decision, handler, recovery}\\\midrule\endhead
+\midrule\endfoot\bottomrule\endlastfoot
+E01 & Resident controls & Boundary values & Seated user cannot reach the main screen & Handler: resident controls. Provide the separate reachable Stop/Privacy fixture; block usability acceptance until the 3/3 reach test passes. Recoverable: after fixture correction. \\ \addlinespace[3pt]
+E02 & Resident controls & Timing and concurrency & Stop races with queued Follow or Accept & Handler: resident controls. Prioritize revocation; discard queued old-context actions and show stop requested. Recoverable: new explicit action only. \\ \addlinespace[3pt]
+E03 & Resident controls & Bad or missing input & Unknown action, missing target, or stale screen context & Handler: resident controls. Reject with INVALID\_\allowbreak{}INPUT, DENIED, or STALE; refresh the view without changing grants. Recoverable: after valid input. \\ \addlinespace[3pt]
+E04 & Resident controls & External dependencies & Touchscreen, speaker, or button circuit fails & Handler: resident controls. Surface output failure/unknown; open safety contact requests stop. Do not show a false acknowledgment. Recoverable: after repair and tests. \\ \addlinespace[3pt]
+E05 & Call manager & Boundary values & A second invitation arrives while a call is active & Handler: local authority. Return BUSY; keep the accepted call and reject the competing invitation. Recoverable: after current call ends. \\ \addlinespace[3pt]
+E06 & Call manager & Timing and concurrency & End or Privacy occurs during media startup & Handler: local authority. Increment epoch first; late media completions close only their old peer/tracks. Recoverable: fresh invitation and acceptance. \\ \addlinespace[3pt]
+E07 & Call manager & Bad or missing input & Missing, expired, or wrong-call lease & Handler: local authority. Deny admission; cancel affected work and retain both permissions false. Recoverable: fresh acceptance. \\ \addlinespace[3pt]
+E08 & Call manager & External dependencies & Signaling or authority process disappears & Handler: local authority. Revoke both scopes and close the call; motion enters its local fault response. Recoverable: new authenticated session; motion still qualified separately. \\ \addlinespace[3pt]
+E09 & Audio/video calling & Boundary values & SDP/ICE exceeds byte or queue limit & Handler: media adapter. Reject/close the attempt with INVALID\_\allowbreak{}INPUT; release buffers and report failed. Recoverable: new valid call. \\ \addlinespace[3pt]
+E10 & Audio/video calling & Timing and concurrency & Late ICE/capture result belongs to an ended call & Handler: media adapter. Discard it by Context; never attach tracks or close a newer call. Recoverable: new call unaffected. \\ \addlinespace[3pt]
+E11 & Audio/video calling & Bad or missing input & Device permission denied or media format unsupported & Handler: media adapter. Return DENIED/UNAVAILABLE and end the attempt; do not silently enable another capture mode. Recoverable: explicit device permission/configuration change. \\ \addlinespace[3pt]
+E12 & Audio/video calling & External dependencies & Camera, microphone, relay, or media link fails & Handler: media adapter. Close outgoing tracks/peer and surface failed or capture unknown; no automatic redial. Recoverable: fresh call after dependency repair. \\ \addlinespace[3pt]
+E13 & Person tracking & Boundary values & No instances, empty mask, or too few admitted zones & Handler: tracking adapter. Return unavailable/NO\_\allowbreak{}DEPTH or LOST; withdraw the target and latch loss. Recoverable: explicit reselection after valid evidence. \\ \addlinespace[3pt]
+E14 & Person tracking & Timing and concurrency & Duplicate, late, or prior-epoch provider result & Handler: tracking adapter. Reject as STALE; do not extend capture expiry or replace a newer selection. Recoverable: new current capture only. \\ \addlinespace[3pt]
+E15 & Person tracking & Bad or missing input & Malformed mask, wrong geometry, NaN, or missing calibration & Handler: tracking adapter. Reject before use; preserve motion\_\allowbreak{}authorized=false and publish no RobotTargetV2. Recoverable: corrected adapter/calibration and separate validation. \\ \addlinespace[3pt]
+E16 & Person tracking & External dependencies & SAM service, Wi-Fi, depth device, or inference worker stops & Handler: tracking adapter. Local watchdog invalidates target without waiting for the service; request stop. Recoverable: fresh selection after repair; no physical-stop guarantee. \\ \addlinespace[3pt]
+E17 & Motion control & Boundary values & Arrival upper bound reaches 1 m or request exceeds the qualified speed cap & Handler: motion supervisor. Latch zero travel/turn when distance plus uncertainty <=1 m; reject external commands over the measured cap (never >0.2 m/s). Recoverable: fresh valid command after qualification. \\ \addlinespace[3pt]
+E18 & Motion control & Timing and concurrency & Stop/expiry races with a target or area update & Handler: motion supervisor/controller watchdog. Latch disarm; caster brakes, balancing keeps zero-travel stabilization in its fixture. Reject old revisions. Recoverable: explicit local/resident rearm after checks. \\ \addlinespace[3pt]
+E19 & Motion control & Bad or missing input & Unqualified frame, missing clearance/support, or nonfinite target & Handler: motion supervisor. Return UNQUALIFIED/INVALID\_\allowbreak{}INPUT and request local fault response; do not guess clearance. Recoverable: after qualification or valid observation. \\ \addlinespace[3pt]
+E20 & Motion control & External dependencies & IMU/encoder/actuator feedback is lost & Handler: local controller/safety path. Latch fault/unknown, isolate drive in the supported test setup; the fixture contains motion/fall. No free-floor balancing test. Recoverable: physical inspection and requalification, not retry. \\ \addlinespace[3pt]
+E21 & Robot platform & Boundary values & Voltage, thermal load or clearance reaches its manifest limit & Handler: platform controller. Refuse startup or latch profile stop/fault in the supported fixture. Reject unmeasured limits. Recoverable: inspected hardware and valid measured manifest. \\ \addlinespace[3pt]
+E22 & Robot platform & Timing and concurrency & Command/watchdog timeout or reboot occurs during motion & Handler: controller watchdog. Expiry selects the profile stop; reboot isolates drive, changes boot and discards queued commands. Recoverable: inspection, new clock mapping/area check and explicit rearm. \\ \addlinespace[3pt]
+E23 & Robot platform & Bad or missing input & Calibration revision, frame units, or sensor sample is missing & Handler: platform adapter. Return UNQUALIFIED/UNAVAILABLE; unknown support/path state is not valid clearance. Recoverable: matching measured configuration. \\ \addlinespace[3pt]
+E24 & Robot platform & External dependencies & Power/driver/brake fails or fixture readiness is lost & Handler: safety path/operator. Isolate drive; an intact passive fixture contains the test. If the fixture itself fails, report fault/unknown and require manual recovery; never promise containment from failed support. Recoverable: physical repair/requalification. \\ \addlinespace[3pt]
+E25 & Call server & Boundary values & One active call already exists for a robot & Handler: call server. Transactional unique index returns 409 ACTIVE\_\allowbreak{}CALL; a matching retry ID returns the original record. Recoverable: after end or same-ID retry. \\ \addlinespace[3pt]
+E26 & Call server & Timing and concurrency & Acceptance races with 60-second timeout or server restart & Handler: call server. Terminal state wins; fail stored active attempts on restart and require fresh acceptance. Recoverable: new attempt. \\ \addlinespace[3pt]
+E27 & Call server & Bad or missing input & Bad UUID/token fields or an event for another robot/call & Handler: call server. Return 400/401/403/404 as appropriate; do not mutate unrelated attempts. Recoverable: valid authenticated request. \\ \addlinespace[3pt]
+E28 & Call server & External dependencies & Database, identity provider, or robot heartbeat is unavailable & Handler: call server. 503 for unverifiable/storage failure; offline after five seconds without heartbeat with last-seen time. Recoverable: repair plus explicit retry/new session. \\ \addlinespace[3pt]
+E29 & Caregiver iOS app & Boundary values & Repeated Call taps while a request is pending & Handler: iOS session adapter. Use one request ID and disable duplicate dispatch; show pending until a real outcome. Recoverable: existing attempt or explicit later call. \\ \addlinespace[3pt]
+E30 & Caregiver iOS app & Timing and concurrency & App backgrounds, disconnects, or reconnects after End & Handler: iOS session adapter. End the foreground call; on reconnect fetch outcome only, never redial. Recoverable: new foreground Call. \\ \addlinespace[3pt]
+E31 & Caregiver iOS app & Bad or missing input & Token expired or server returned an unknown/malformed status & Handler: iOS session adapter. Require sign-in or show unavailable/unknown; never display connected from incomplete data. Recoverable: valid session/compatible response. \\ \addlinespace[3pt]
+E32 & Caregiver iOS app & External dependencies & No network, phone media permission, or relay route & Handler: iOS session adapter. Surface the specific failure; permit explicit same-ID retry where D1 allows it. Recoverable: after dependency restoration. \\ \addlinespace[3pt]
+E33 & Authentication and pairing & Boundary values & Account exists but no active pairing permits this robot & Handler: identity adapter. Return 403; do not create a pairing or resident grant implicitly. Recoverable: explicit authorized pairing. \\ \addlinespace[3pt]
+E34 & Authentication and pairing & Timing and concurrency & Revocation or logout races with an in-flight request & Handler: identity adapter. Invalidate the learned session/epoch before admitting new work; old callbacks cannot restore it. Recoverable: fresh sign-in and new resident acceptance. \\ \addlinespace[3pt]
+E35 & Authentication and pairing & Bad or missing input & Wrong issuer/audience, expired token, or bad PKCE callback & Handler: identity adapter. Return 401 or abort sign-in; discard credentials without logging them. Recoverable: fresh legitimate sign-in. \\ \addlinespace[3pt]
+E36 & Authentication and pairing & External dependencies & Identity discovery/introspection service is unavailable & Handler: identity adapter. Return 503 and deny new access; fixture roles are never a production fallback. Recoverable: explicit retry after recovery. \\ \addlinespace[3pt]
+E37 & Notifications & Boundary values & Invitation has already expired or sound repeat cap is reached & Handler: notification adapter. Cancel announcement; report no answer/expired without repeating indefinitely. Recoverable: new invitation. \\ \addlinespace[3pt]
+E38 & Notifications & Timing and concurrency & Decline/End/privacy occurs after a timer callback is dequeued & Handler: notification adapter. Recheck Context at dispatch and cancel stale sound/banner. Recoverable: new current invitation. \\ \addlinespace[3pt]
+E39 & Notifications & Bad or missing input & Caller name, deadline, or call identity is missing & Handler: notification adapter. Reject announcement with INVALID\_\allowbreak{}INPUT; do not display an unnamed trusted caller. Recoverable: corrected authenticated invitation. \\ \addlinespace[3pt]
+E40 & Notifications & External dependencies & Screen/audio output or foreground status transport fails & Handler: notification adapter. Report failed/unknown delivery to call manager; an unobserved alert is not acknowledgment. Recoverable: output repair or fresh session. \\ \addlinespace[3pt]
+E41 & Configuration & Boundary values & Speed/lease/retention value exceeds the permitted schema range & Handler: configuration loader. Reject the new revision and keep the dependent feature disabled. Recoverable: validated revision. \\ \addlinespace[3pt]
+E42 & Configuration & Timing and concurrency & Configuration changes while a call or movement is active & Handler: configuration loader. Refuse apply with BUSY; require disarm/media close and expected-revision check. Recoverable: after idle and revision refresh. \\ \addlinespace[3pt]
+E43 & Configuration & Bad or missing input & Unknown keys, invalid JSON, missing units or calibration ID & Handler: configuration loader. Return INVALID\_\allowbreak{}INPUT/UNQUALIFIED; do not substitute permissive defaults. Recoverable: corrected complete config. \\ \addlinespace[3pt]
+E44 & Configuration & External dependencies & Secret store, manifest file, or approved endpoint is missing & Handler: configuration loader. Return UNAVAILABLE/UNQUALIFIED; do not enter deployed/motion mode. Recoverable: restored approved dependencies. \\ \addlinespace[3pt]
+E45 & Logging & Boundary values & 256-entry queue or rotated-file quota is full & Handler: diagnostic writer. Drop ordinary metadata with a visible lost-log counter; never block revoke or local control. Recoverable: after drain/storage recovery; lost records remain lost. \\ \addlinespace[3pt]
+E46 & Logging & Timing and concurrency & Late log event arrives from an old call or boot & Handler: diagnostic writer. Store only its original Context as historical metadata; never mutate live call state. Recoverable: live operation unaffected. \\ \addlinespace[3pt]
+E47 & Logging & Bad or missing input & Event includes a token, raw media, name, or invalid code & Handler: diagnostic writer. Reject/redact at the typed boundary with INVALID\_\allowbreak{}INPUT; increment diagnostic rejection count. Recoverable: valid metadata-only event. \\ \addlinespace[3pt]
+E48 & Logging & External dependencies & Disk is full/locked or writer unavailable & Handler: diagnostic writer. Report diagnostic degradation and retain in-memory fault status; call-database failure still returns 503 separately. Recoverable: storage repair; no fabricated durable receipt. \\ \addlinespace[3pt]
+E49 & Robot platform & Boundary values & Low profile is missed, protrudes into an approach, or obstructs a walkway (PR-01) & Handler: platform qualification, Liam with Gavin. Refuse the physical revision/placement until visibility, stability, clearance and parking checks pass. Recoverable: revised mockup and requalification; not a software retry. \\ \addlinespace[3pt]
+E50 & Motion / local authority & External dependencies & Bathroom/wet-area guard opens, faults or cannot establish the approved route (PR-02) & Handler: local authority plus wired guard. Publish excluded/unknown; revoke FOLLOW and all capture; latch stop. Physical barriers define the first route. Recoverable: local inspection, new area approval and explicit acceptance/rearm. \\ \addlinespace[3pt]
+E51 & Media / local authority & Timing and concurrency & Privacy guard opens during a call or capture close is uncertain (PR-03) & Handler: wired capture latch/platform broker. Drop capture enable, invalidate epoch and clear media/tracking buffers; display off only with driver/gate confirmation. Recoverable: inspected guard/devices and fresh area/call approval. \\ \addlinespace[3pt]
+E52 & Resident controls / iOS app & Bad or missing input & User cannot identify the action/state, or touch/voice input is unsuitable (PR-04) & Handler: UI adapters, Gavin/Austin. Retain grants unchanged; offer plainly labeled accessible controls and reachable switch alternative, surface uncertainty. Recoverable: supported input and explicit action; usability acceptance waits for task checks. \\ \addlinespace[3pt]
+E53 & Local authority & Boundary values & Area permit reaches its expiry, including exact equality & Handler: authority timer. At now>=expiry increment revision/epoch and revoke capture/FOLLOW, even without a callback. Recoverable: a fresh local check and new resident actions. \\ \addlinespace[3pt]
+E54 & Local authority & Timing and concurrency & Stale armArea result races with relocation, config change or guard opening & Handler: local authority. Atomically compare boot/policy/revision and physical guard before publishing allowed; stale completion cannot restore access. Recoverable: new local check. \\ \addlinespace[3pt]
+E55 & Platform / configuration & Bad or missing input & Malformed drive frame, unknown profile, or absent clock/stop-envelope data & Handler: typed adapter/configuration loader. Reject with INVALID\_\allowbreak{}INPUT or UNQUALIFIED; retain disarm; never extend an old lease. Recoverable: corrected record and qualification. \\ \addlinespace[3pt]
+E56 & Platform / local authority & External dependencies & Guard/capture feedback or USB link is unavailable & Handler: wired guard and controller watchdog. Drop capture enable, expire movement locally and show unknown where unobserved. Recoverable: inspection, fresh mapping/area approval and explicit new grants. \\ \addlinespace[3pt]
+\end{longtable}\endgroup
+
+\section{Requirements traceability table}
+The baseline is the five user stories, their use-case acceptance criteria, and D0's explicit platform/privacy constraints. Derived constraints are labeled D-NF rather than presented as new stakeholder promises. D-NF10--13 are peer-derived design constraints linked to the received feedback; their validation is still open. Must means required for the scoped journey; proposed limits/retention still require confirmation. A design mapping is not a passing verification result. Open cells below explain a gap rather than claiming a feature is complete.
+
+\begingroup\small
+\begin{longtable}{@{}>{\RaggedRight\arraybackslash}p{0.27\linewidth}>{\RaggedRight\arraybackslash}p{0.08\linewidth}>{\RaggedRight\arraybackslash}p{0.28\linewidth}>{\RaggedRight\arraybackslash}p{0.285\linewidth}@{}}
+\caption{Forward requirements traceability}\\
+\toprule\textbf{Requirement and source} & \textbf{Priority} & \textbf{Specific design elements / error IDs} & \textbf{How it is addressed; remaining gap}\\\midrule\endfirsthead
+\toprule\textbf{Requirement and source} & \textbf{Priority} & \textbf{Specific design elements / error IDs} & \textbf{How it is addressed; remaining gap}\\\midrule\endhead
+\midrule\endfoot\bottomrule\endlastfoot
+US-01 - Continue a call during a requested room transition & Must & CallLease; RobotTargetV2; command lease; Fig. 1 and 2; E06, E14, E18 & Independent CALL/FOLLOW and local target expiry preserve call state during tracking loss. Live tracking and physical route behavior remain unqualified. \\ \addlinespace[3pt]
+US-02 - Accept or decline before camera/microphone turn on & Must & act(accept/decline); setMedia(CallLease); Fig. 1; E02, E06, E10, E34 & No lease before current acceptance; epoch revocation precedes async cleanup. Actual device-off behavior still needs fixture observation. \\ \addlinespace[3pt]
+US-03 - Understand declined, no answer, and robot offline outcomes & Must & D1 CallAttempt.status/last\_\allowbreak{}seen; I1 CallStatus; Fig. 1; E25--E28, E31 & Terminal outcomes and explicit stale labels describe communication, not health. Foreground iOS integration remains to be built. \\ \addlinespace[3pt]
+US-04 - Do not switch to or follow another person & Must & Selection epoch; admit; RobotTargetV2; Fig. 2; E13--E16, E19 & Ambiguity/loss latches disarm. Same-box identity swaps and sustained real identity continuity remain unresolved, so no motion admission. \\ \addlinespace[3pt]
+US-05 - Reach Stop/Privacy from a seated position & Must & I4 supervised contacts; I15 ResidentView/control fixture; Fig. 2; E01, E04, E21 & Gavin/Liam will measure reach and button operation in 3/3 attempts. No tested mounting position or switch geometry is claimed. \\ \addlinespace[3pt]
+AC-01.1 - Named caller within 2 s; no capture before acceptance & Must & announce; act; CallLease; Fig. 1; E06, E10, E37--E40 & Announcement and capture admission are distinct; two-second end-to-end timing and physical capture indicators remain unverified. \\ \addlinespace[3pt]
+AC-01.2 - 5 m transition; <=0.2 m/s; stop within 1 m; keep call & Must & Qualified speed cap; follower; DriveCommand; I12; Fig. 2; E17--E20, E55 & Initial cap is 0.05 m/s and must satisfy the measured stopping bound. The 5 m path, turning and concurrent media remain physical integration tests. \\ \addlinespace[3pt]
+AC-01.3 - Loss: zero travel request <=1 s; <=25 mm final displacement; <5 mm/s for 1 s within 10 s; no automatic resume & Must & StopEnvelope inequality; profile stop; stop anchor/window; Fig. 2; E14, E18--E20, E22 & Full loss-to-brake delay and measurement margin limit speed. Settled is observed, not assumed. Each base must qualify separately; free-floor balancing remains unavailable. \\ \addlinespace[3pt]
+AC-02.1 - Caregiver sees Connected within 2 s of acceptance & Must & D1 MEDIA\_\allowbreak{}CONNECTED transition; v2 signal; I1 status; Fig. 1; E10--E12, E28 & Only confirmed media yields connected. Bench 30-second deadlines do not prove this target; concurrent deployment test needed. \\ \addlinespace[3pt]
+AC-02.2 - Declined within 2 s; camera/microphone never started & Must & act(decline); no CallLease; cancel announcement; Fig. 1; E06, E10, E38 & Decline is terminal; late callbacks are rejected. Notification latency and physical capture audit remain open. \\ \addlinespace[3pt]
+AC-02.3 - After 5 s without robot heartbeat show offline and last seen & Must & D1 Robot.last\_\allowbreak{}seen/last\_\allowbreak{}sequence; I2; I1; Fig. 1; E26, E28, E30 & Session-scoped heartbeat monotonicity drives offline outcome. New session never resumes an old attempt; real fault-injection test needed. \\ \addlinespace[3pt]
+UC-01 - Camera/mic off, FOLLOW off, robot stopped after End & Must & act(end); setMedia(null); setFollow(false); Fig. 1 and 2; E06, E10, E18, E20 & Revoke permissions immediately; report observed capture/movement separately. Physical stop and capture-state checks remain unqualified. \\ \addlinespace[3pt]
+UC-01/02 - One floor, invited paired caregiver, no active second call & Must & Pairing.active; unique active-call index; Context; Fig. 1; E05, E25, E33 & Busy arbitration and pairing protect scope. Route accessibility/clearance still require measured configuration. \\ \addlinespace[3pt]
+D-NF01 - No audio/video recording; minimal retained metadata (D0 privacy, UC-01) & Must & CallAttempt metadata only; record(Event); Fig. 1; E09, E45, E47--E48 & Buffers/signaling are volatile; provisional seven-day diagnostics and 30-day call metadata need team approval, not medical retention assumptions. \\ \addlinespace[3pt]
+D-NF02 - Local Stop/Privacy and movement authority (D0 decisions 4/5) & Must & I4 guard/enable/stop; epoch; controller watchdog; Fig. 1/2; E02, E06, E18, E20, E56 & Wired revocation and local profile response do not wait on a network. Circuit behavior and stopping distance require supported tests. \\ \addlinespace[3pt]
+D-NF03 - Observation freshness <=200 ms (D1 development constraint) & Must & Capture ledger; target expiry; StopEnvelope; Fig. 2; E14, E16, E18, E55 & Expiry rejects late work; the stopping bound includes sensor age plus downstream delay. A fresh record alone never qualifies control stability. \\ \addlinespace[3pt]
+D-NF04 - Authenticated encrypted remote access (D0 I12--I14) & Must & PKCE signIn; verify; Principal/Pairing; v2 signal; Fig. 1; E11--E12, E33--E36 & Fixture identities/loopback routing cannot be deployed. Provider credentials, TLS/relay route, native media build, and revocation latency need verification. \\ \addlinespace[3pt]
+D-NF05 - No media or movement resume on reconnect/restart (D0 decision 5) & Must & Context boot/epoch; terminal CallAttempt; new peer; Fig. 1 and 2; E06, E10, E18, E22, E26, E30 & Old timers/results cannot restore leases; a fresh explicit call, acceptance, and Follow are required. \\ \addlinespace[3pt]
+D-NF06 - Custom build, fit, power and mechanical testing (D0 decision 1) & Must & PlatformManifest.profile; profile adapter; fixture; Fig. 2; E21--E24, E55 & Both caster and balancing candidates are explored; no final base is selected. Liam owns CAD/build/fixtures and separate qualification; BOM/integration remain open. \\ \addlinespace[3pt]
+D-NF07 - Affordable hardware and hosting within approved allowance (D0 constraints) & Must & Versioned Config; PlatformManifest; deployment profile; Fig. 2; E21, E41, E44 & No numeric budget is supplied. Quote hardware/carrier/power, identity host, relay and operation; architecture cannot claim budget compliance yet. \\ \addlinespace[3pt]
+D-NF08 - Accessible readable, honest current state (D0 I15/16, US-05) & Must & ResidentView; AnnouncementState; iOS CallStatus age; Fig. 1; E01, E04, E31, E40 & Use readable state labels and unknown where unobserved. Reach/VoiceOver/text sizing and actual display testing remain open. \\ \addlinespace[3pt]
+D-NF09 - Traceable diagnostic evidence without blocking controls (D0 error handlers; derived) & Must & Event context/time index; bounded record queue; Fig. 1 and 2; E45--E48 & Metadata supports call/error/timing reconstruction; queue/disk failure never grants consent or blocks revocation. No telemetry log is proof of physical success. \\ \addlinespace[3pt]
+D-NF10 - Conspicuous form and clear walking routes (peer PR-01) & Must & PlatformManifest visibility revision; approved parking; Fig. 2; E21, E49 & Liam/Gavin compare full-scale mockups and clearance/stability trade-offs. Final dimensions and physical visibility/approach tests remain open. \\ \addlinespace[3pt]
+D-NF11 - Exclude bathrooms/wet areas from initial operation (peer PR-02) & Must & armArea; EnvironmentPolicy/state; I4 guard; Fig. 2; E19, E50, E53--E56 & Physical barriers, local inspection, a bounded permit and held operator enable define supervised trials. No autonomous bathroom detection or unattended readiness is claimed. \\ \addlinespace[3pt]
+D-NF12 - No bathroom camera exposure or unapproved listening (peer PR-03) & Must & View check; shared capture owner/latch; epoch revoke; Fig. 1/2; E06, E12, E51, E54, E56 & Opaque guards exclude bathroom views; faults revoke media and tracking capture. Physical closure/feedback and full-route view checks remain to be tested. \\ \addlinespace[3pt]
+D-NF13 - Low-effort controls across varied abilities/technology familiarity (peer PR-04) & Must & ResidentView/act/I4; scalable iOS text/VoiceOver; Fig. 1; E01, E04, E52 & Test the key call/Stop/Privacy tasks, state recognition, errors and assistance. Reach and formative evaluation are pending; universal usability is not claimed. \\ \addlinespace[3pt]
+\end{longtable}\endgroup
+
+\subsection*{Reverse check}
+Every D0 and glue component below has a requirement and a concrete design element. Optional routines, help detection, smart-home control, item handling, and screen mechanisms are not additional requirements in this baseline. No component is justified merely because a library exists.
+
+\begingroup\small
+\begin{longtable}{@{}>{\RaggedRight\arraybackslash}p{0.2\linewidth}>{\RaggedRight\arraybackslash}p{0.23\linewidth}>{\RaggedRight\arraybackslash}p{0.36\linewidth}>{\RaggedRight\arraybackslash}p{0.13\linewidth}@{}}
+\caption{Reverse architecture-to-requirement check}\\
+\toprule\textbf{Component} & \textbf{Requirement basis} & \textbf{Concrete design / figure} & \textbf{Edge cases}\\\midrule\endfirsthead
+\toprule\textbf{Component} & \textbf{Requirement basis} & \textbf{Concrete design / figure} & \textbf{Edge cases}\\\midrule\endhead
+\midrule\endfoot\bottomrule\endlastfoot
+Resident controls & US-02/05; D-NF08/13 & ResidentView, act, supervised I4 contacts; Fig. 1/2 & E01--E04, E52 \\ \addlinespace[3pt]
+Call manager & US-01/02/04; D-NF02/05/11/12 & CallLease, armArea, epoch and permit revision; Fig. 1/2 & E05--E08, E50/51, E53/54 \\ \addlinespace[3pt]
+Audio/video calling & US-01/02; AC-02.1/02.2; D-NF12 & lease-bound capture broker/latch, close; Fig. 1 & E09--E12, E51/56 \\ \addlinespace[3pt]
+Person tracking & US-04; D-NF03 & capture ledger, admit, RobotTargetV2; Fig. 2 & E13--E16 \\ \addlinespace[3pt]
+Motion control & US-01/04; AC-01.2/01.3; D-NF11 & StopEnvelope, profile stop, DriveCommand; Fig. 2 & E17--E20, E50/55 \\ \addlinespace[3pt]
+Robot platform & US-05; D-NF06/07/10/12 & PlatformManifest, shared capture owner, USB adapter; Fig. 2 & E21--E24, E49, E55/56 \\ \addlinespace[3pt]
+Call server & US-03; AC-02.3 & CallAttempt, Robot.last\_\allowbreak{}seen; Fig. 1 & E25--E28 \\ \addlinespace[3pt]
+Caregiver iOS app & US-01/03; D-NF08/13 & Call/End, readable accessible status; Fig. 1 & E29--E32, E52 \\ \addlinespace[3pt]
+Authentication & US-02/03; D-NF04 & Principal, Pairing, PKCE signIn/verify; Fig. 1 & E33--E36 \\ \addlinespace[3pt]
+Notifications & US-02/03; AC-01.1 & announce/cancel, delivery observation; Fig. 1 & E37--E40 \\ \addlinespace[3pt]
+Configuration & D-NF02/05/06/07/11/12 & loadConfig/apply; EnvironmentPolicy/StopEnvelope; Fig. 2 & E41--E44, E50/51, E55 \\ \addlinespace[3pt]
+Logging & US-03; D-NF01/09 & Event, record, bounded diagnostics; Fig. 1/2 & E45--E48 \\ \addlinespace[3pt]
+\end{longtable}\endgroup
+
+\section{Design rationale}
+D0's numbered decisions remain the starting rationale. The entries below record refinements, not a replacement D0 log. R8 and R9 are marked peer-review-driven and cite PR-01--04; R7/R10 record the completed stop/profile design; the other entries are engineering refinements. D0 and D1 have not been edited for this work. Peer review took place on October 26, 2026. Follow-up dates are proposed targets; physical and usability validation are not recorded as completed.
+
+\begin{minipage}{\linewidth}
+\textbf{R1. One local permission authority.} We chose one local authority with bounded adapters over separate writable permission state in the app, server, and robot because revocation must have one current meaning. We accepted the trade-off of explicit boot/epoch propagation because it makes stale work rejectable.
+
+{\small D0 decisions 4/5; D1 consent boundary; US-02, D-NF02/05; E06, E10, E18. Engineering refinement; not a peer-driven change.\par}
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\textbf{R2. Continue the tested bench before porting.} We chose contract-preserving adapters around the working Node/WebRTC bench over an immediate FastAPI rewrite because eight local generated-media calls provide a finite regression baseline. We accepted the trade-off of retaining a temporary implementation different from D1 because golden traces can test a later product port without two authorities.
+
+{\small D0 decision 3; D1 backend choice; US-01/03; E26, E28. D1 is a proposal, not a claim about the current runtime. Engineering refinement; not a peer-driven change.\par}
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\textbf{R3. Explicit robot-frame target type.} We chose RobotTargetV2 over renaming D1 optical depth as robot distance because camera depth, radial ToF range, and floor-plane position are different quantities. We accepted the trade-off of a new adapter and major-version type because a wrong frame can make a valid-looking number unsafe to use.
+
+{\small D0 I7/I9; D1 TrackRecord; US-04, D-NF03; E15, E19. D0/D1 stay unchanged; new type is specified here. Engineering refinement; not a peer-driven change.\par}
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\textbf{R4. SAM provider behind conservative admission.} We chose to evaluate SAM instance masks behind the existing capture/selection/depth gates over treating provider object IDs as permission to follow because responses can be late and object IDs do not establish cross-request personal identity. We accepted the trade-off of abstention and possible unusable latency because a mask demo must not imply qualified motion.
+
+{\small D0 decisions 4/5; D1 tracking baseline; US-04; E13--E16. Older detectors remain comparison evidence; provider/live transport is unresolved. Engineering refinement; not a peer-driven change.\par}
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\textbf{R5. Separate media signaling from outcome records.} We chose a bounded v2 SDP/ICE channel alongside D1 call-status APIs over putting provider/media buffers into CallAttempt because signaling is transient and has different limits and privacy concerns. We accepted the trade-off of another narrowly scoped endpoint because it keeps the durable data model minimal.
+
+{\small D0 decision 3 and I12; D1 data model; US-01/03, D-NF01/04; E09--E12, E27. Engineering refinement; not a peer-driven change.\par}
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\textbf{R6. Foreground iOS first.} We chose the caregiver iOS companion with foreground Call/End over adding background incoming-call infrastructure now because the requested companion can exercise the scoped journey without claiming untested ringing behavior. We accepted the trade-off of ending on background/disconnect because reliable background media and notifications need their own integration.
+
+{\small D1 iOS choice; US-01/03; E29--E32. No new background-calling requirement is introduced. Engineering refinement; not a peer-driven change.\par}
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\textbf{R7. Profile-specific stopping with measured admission.} We chose explicit caster braking or supported zero-travel balancing, bounded by a measured StopEnvelope, over treating zero requested speed as a physical stop because the two bases react differently to torque removal and feedback faults. We accepted the trade-off of a lower initial speed cap and supported testing because the 25 mm target must include sensing delay, command expiry and real braking distance.
+
+{\small D0 decision 4; D1 stopping evidence; AC-01.3, D-NF02/03/06; E18--E24, E55/56. Engineering completion; no physical pass is claimed.\par}
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\textbf{R8. Visibility and accessible controls before added mechanisms (peer-review-driven: PR-01/04).} We chose full-scale visibility, reach and usability comparisons with a fixed screen/mount baseline over immediately adding a telescoping screen or simply increasing height because a conspicuous form and reachable controls must also preserve stability and walkway clearance. We accepted the trade-off of keeping dimensions and household use unapproved because Liam and Gavin need measured mechanical checks and task observations before selecting the final geometry.
+
+{\small D0 decisions 1/2/6; US-05, D-NF06/07/08/10/13; E01, E21--E24, E49/E52. Updated D2 platform and controls; physical testing remains open. D0/D1 unchanged.\par}
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\textbf{R9. Supervised bathroom exclusion and shared capture revocation (peer-review-driven: PR-02/03).} We chose a locally checked, guarded trial route with an expiring permit and one capture owner over inferring bathroom safety from a room label or closing only the video-call camera because the first prototype has neither reliable autonomous boundaries nor independent permission for tracking capture. We accepted the trade-off of physical barriers, an operator and no bathroom monitoring because faults must have an explicit restrictive outcome without creating unapproved listening or filming.
+
+{\small D0 decisions 4/5 and privacy constraint; D-NF11/12; E50/51, E53--E56; Fig. 1/2. Local/wired behavior is defined; capture/guard performance remains a hardware test. D0/D1 unchanged.\par}
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\textbf{R10. Explore both bases behind one contract.} We chose explicit caster and balancing profiles behind DriveCommand/MotionObservation over selecting a final base prematurely because the team is exploring both a two-drive-wheel/rear-caster platform and a balancing platform. We accepted the trade-off of separate manifests, fixtures and qualification work because a successful stop or simulation result on one cannot establish safe behavior on the other.
+
+{\small D0 decisions 1/4; D-NF06/07; E20--E24, E55; Fig. 2. Records the current exploration rather than changing the shared goal or claiming a hardware selection. D0/D1 unchanged.\par}
+\end{minipage}\par\medskip
+
+\subsection*{Technical references}
+\footnotesize
+[1] \href{https://webrtc.org/getting-started/peer-connections}{WebRTC peer connections and separate signaling};
+[2] \href{https://dev.meta.ai/docs/sam/reading-segmentation}{Meta SAM output, frame association, and object-ID limits};
+[3] \href{https://www.rfc-editor.org/rfc/rfc8252}{RFC 8252, native-app authorization and PKCE};
+[4] \href{https://www.keycloak.org/securing-apps/oidc-layers}{Keycloak OIDC endpoints and token verification}.
+\normalsize
+
+\clearpage
+\section{Peer design review notes}
+\textbf{Status: feedback recorded; follow-up validation open.} Clare Hooper (mirror project) raised three feedback themes during the review on October 26, 2026: the robot may be too low to notice and could become a trip hazard; bathroom slip/injury concerns conflict with camera privacy; and ease of use should be a primary focus for people with differing technology familiarity. The paraphrases below split the bathroom theme into safety and privacy actions. No testing or completion by reviewers is implied.
+
+\textbf{Feedback coverage.} These notes record the feedback from Clare Hooper reported by Austin. Our team raised one issue while reviewing her mirror project; no second issue was raised.
+
+\textbf{Schedule.} The written design revisions below were completed on November 11, 2026. November 18, 2026 is the proposed verification follow-up target, aligned with the presentation-materials milestone. The final design report is due December 2, 2026. The proposed action targets are planning dates, not evidence that physical or usability checks have passed.
+
+\begin{minipage}{\linewidth}
+\subsection*{PR-01. Low profile and trip risk}
+\textbf{Criterion:} risk. \textbf{Issue/source:} the robot may be too short to notice, creating a trip hazard; raised by Clare Hooper (mirror project). \textbf{Action:} define visibility, stability, clearance, reach and parking criteria for both base candidates, with full-scale mockup comparisons before dimensions are approved. \textbf{Owner:} Liam Patel, with Gavin Lamphier. \textbf{Priority:} must-fix. \textbf{Due:} design revision November 11, 2026 (applied); verification follow-up November 18, 2026 (proposed). \textbf{Status:} visibility/parking design updated; compare mockups and physically check both base candidates. \textbf{Links:} Robot platform; D-NF10; E49; R8; Fig. 2.
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\subsection*{PR-02. Bathroom access and slip risk}
+\textbf{Criterion:} risk. \textbf{Issue/source:} bathrooms are a high-risk setting for slips/injury, and the robot could add an obstruction; raised by Clare Hooper (mirror project). \textbf{Action:} specify a physically guarded route, local armArea/expiry and profile-specific stopping; define supported tests for guard loss and boundary uncertainty before movement is admitted. \textbf{Owner:} Liam Patel, with Austin Heiss. \textbf{Priority:} must-fix. \textbf{Due:} design revision November 11, 2026 (applied); verification follow-up November 18, 2026 (proposed). \textbf{Status:} guarded trial/armArea/expiry design specified; physical guard and stopping tests remain open. \textbf{Links:} Local authority/motion; D-NF11; E50, E53--E56; R9; Fig. 2.
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\subsection*{PR-03. Bathroom camera privacy}
+\textbf{Criterion:} risk. \textbf{Issue/source:} camera monitoring in or toward the bathroom conflicts with privacy; raised by Clare Hooper (mirror project). \textbf{Action:} specify full-route bathroom view exclusion, shared media/tracking capture revocation and hardware gate behavior; define shutdown/off/unknown checks. No ambient microphone monitoring is substituted. \textbf{Owner:} Austin Heiss, with Gavin Lamphier. \textbf{Priority:} must-fix. \textbf{Due:} design revision November 11, 2026 (applied); verification follow-up November 18, 2026 (proposed). \textbf{Status:} shared capture gate and revocation specified for media/tracking; physical closure/view tests remain open. \textbf{Links:} Platform capture/local authority; D-NF12; E51, E54, E56; R9; Fig. 1/2.
+\end{minipage}\par\medskip
+
+\begin{minipage}{\linewidth}
+\subsection*{PR-04. Simple, accessible interaction}
+\textbf{Criterion:} clarity. \textbf{Issue/source:} prioritize ease of use for residents with varying technology experience and abilities; raised by Clare Hooper (mirror project). \textbf{Action:} specify plainly labeled call/Stop/Privacy controls, readable non-color-only state, reachable alternate input and caregiver text-size/VoiceOver support; define the accept/decline/Stop/Privacy/state-recognition walkthrough and error/assistance observations. \textbf{Owner:} Gavin Lamphier, with Austin Heiss. \textbf{Priority:} must-fix. \textbf{Due:} design revision November 11, 2026 (applied); verification follow-up November 18, 2026 (proposed). \textbf{Status:} interaction criteria added; formative evaluation open. \textbf{Links:} Resident controls/iOS; D-NF13; E52; R8; Fig. 1.
+\end{minipage}\par\medskip
+
+\textbf{Feedback summary.} Risk drew the most recorded actions: three of four; clarity accounts for one. These counts describe the action items, not numbers of reviewers. Review-driven D2 changes appear in R8/R9 and the linked component, error, and traceability sections. D0/D1 remain unchanged.
+
+\textbf{Our reviewing.} One issue was raised (feasibility), by Austin on Clare Hooper's mirror project: the AI clothing try-on should accurately represent how garments fit the user's body rather than guess their appearance. No second issue was raised.
+
+\textbf{Follow-up status.} The received feedback, reviewer, review date and single outgoing issue are recorded. Owners should review the proposed November 18 targets and record evidence for the remaining physical, privacy and usability checks. The design actions now define mechanisms, interfaces and fault behavior; fabrication, deployment and test evidence remain open.
+\end{document}

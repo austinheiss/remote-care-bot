@@ -1,0 +1,23 @@
+# Local credentials and private runtime data (never a substitute for secret scanning).
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+.DS_Store
+__pycache__/
+*.pyc
+tmp/
+*.aux
+*.log
+*.out

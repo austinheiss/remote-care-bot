@@ -1,0 +1,345 @@
+% Source Markdown SHA256: 12bdec3a0054248a49156e76e6e7907d3ac55dd666a6050de83d4570e42e5cb1
+% Detailed system design. Compile with Tectonic or XeLaTeX.
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{fontspec}
+\IfFileExists{/System/Library/Fonts/Supplemental/Times New Roman.ttf}{%
+  \setmainfont{Times New Roman}[Path=/System/Library/Fonts/Supplemental/,
+    Extension=.ttf,UprightFont=*,BoldFont=* Bold,ItalicFont=* Italic,
+    BoldItalicFont=* Bold Italic]
+  \setmonofont{Times New Roman}[Path=/System/Library/Fonts/Supplemental/,Extension=.ttf]
+}{\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}\setmonofont{Times New Roman}}%
+  {\setmainfont{Liberation Serif}\setmonofont{Liberation Serif}}}
+\usepackage{graphicx}
+\usepackage{booktabs,longtable,array,ragged2e}
+\usepackage{fancyvrb}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={In-Home Assistive Robot: User Stories and Use Cases},
+  pdfauthor={Gavin Lamphier; Liam Patel; Austin Heiss}}
+\captionsetup{font=small,labelfont=bf,labelsep=period,skip=8pt,hypcap=false}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 1pt}
+\setlength{\emergencystretch}{2em}
+\setlength{\LTpre}{8pt}
+\setlength{\LTpost}{10pt}
+\renewcommand{\baselinestretch}{1.08}
+\newcommand{\field}[1]{\texttt{#1}}
+\pagestyle{plain}
+
+
+\begin{document}\pagenumbering{gobble}
+\begin{titlepage}\centering\vspace*{1.2in}
+{\LARGE\bfseries In-Home Assistive Robot\par}
+\vspace{0.25in}{\Large User Stories and Use Cases\par}
+\vspace{0.8in}
+\begin{tabular}{ll}
+Gavin Lamphier & Industrial Design\\[6pt]
+Liam Patel & Mechanical Engineering\\[6pt]
+Austin Heiss & Computer Science\\[6pt]
+\end{tabular}
+\vfill
+\begin{minipage}{0.84\textwidth}\textbf{Goal.} Our robot lets an older or disabled adult at home take video calls from a family caregiver and, if they want, have the robot follow them from room to room during the call. The robot stops following as soon as it loses track of them or a safety check fails.\end{minipage}
+\par\vspace{0.16in}{\small AI assisted with LaTeX formatting.\par}
+\vspace*{0.6in}
+\end{titlepage}\pagenumbering{arabic}
+
+
+\textbf{Project:} In Home Assistive Robot / remote-care-bot
+
+Our robot is a compact two-wheel robot with a front-facing screen. It lets a family caregiver have a video conversation with an older or disabled adult at home, and it can follow the resident from room to room so the conversation doesn't have to end when they get up. The resident decides when calls start, when the robot follows, and when it stops.
+
+\section{Stakeholder map}
+
+\begingroup\small
+
+\begin{longtable}{@{}>{\RaggedRight\arraybackslash}p{0.14\linewidth}>{\RaggedRight\arraybackslash}p{0.39\linewidth}>{\RaggedRight\arraybackslash}p{0.4\linewidth}@{}}
+
+\toprule\textbf{Category} & \textbf{Specific roles} & \textbf{Needs}\\\midrule\endfirsthead
+
+\toprule\textbf{Category} & \textbf{Specific roles} & \textbf{Needs}\\\midrule\endhead
+
+\midrule\endfoot\bottomrule\endlastfoot
+
+Primary & Older or disabled adult who lives alone or spends much of the day alone & Keep talking with family while moving around the home; decide who can see them and when. US-01, US-02. \\ \addlinespace[3pt]
+
+Secondary & Remote family caregiver (for example, an adult child in another city) & Understand what actually happened when a call doesn't connect, without guessing about the resident's health. US-03. \\ \addlinespace[3pt]
+
+Hidden & Other people in the home, such as a spouse, roommate or visitor & Not be followed, filmed or bumped into by a robot that isn't there for them. US-04. \\ \addlinespace[3pt]
+
+Hidden & Residents who use a wheelchair or have limited reach or dexterity & Use the robot's controls and screen from a seated position. US-05. \\ \addlinespace[3pt]
+
+\end{longtable}
+
+\endgroup
+
+\section{User stories}
+
+\par\medskip
+\begin{minipage}{\linewidth}
+\subsection*{US-01 - Keep a call going while moving to another room}
+
+\textbf{Category:} Primary - older adult who lives alone. \textbf{Story:} As an older adult on a video call with my daughter, I want the call to come with me when I walk to another room, so that I don't have to end the conversation or shout across the house.
+
+\begingroup\small
+
+\begin{tabular}{@{}>{\RaggedRight\arraybackslash}p{0.2\linewidth}>{\RaggedRight\arraybackslash}p{0.75\linewidth}@{}}
+
+\toprule\textbf{INVEST} & \textbf{Self-check}\\\midrule
+
+Independent & Builds on an accepted call but delivers its own value: the conversation survives a room change. \\ \addlinespace[3pt]
+
+Negotiable & How the resident asks the robot to follow is left open. \\ \addlinespace[3pt]
+
+Valuable & The conversation continues instead of being cut short. \\ \addlinespace[3pt]
+
+Estimable & One short route on one floor at the robot's tested speed of 0.2 m/s. \\ \addlinespace[3pt]
+
+Small & One resident-requested room change; stairs and remote driving are excluded. \\ \addlinespace[3pt]
+
+Testable & UC-01 and AC-01.1 to AC-01.3. \\ \addlinespace[3pt]
+
+\bottomrule
+\end{tabular}
+
+\endgroup
+\end{minipage}
+\par\medskip
+
+\par\medskip
+\begin{minipage}{\linewidth}
+\subsection*{US-02 - Decide before the camera turns on}
+
+\textbf{Category:} Primary - older adult who lives alone. \textbf{Story:} As an older adult who lives alone, I want to accept or decline each caregiver call before my camera and microphone turn on, so that no one can see or hear into my home without my say-so.
+
+\begingroup\small
+
+\begin{tabular}{@{}>{\RaggedRight\arraybackslash}p{0.2\linewidth}>{\RaggedRight\arraybackslash}p{0.75\linewidth}@{}}
+
+\toprule\textbf{INVEST} & \textbf{Self-check}\\\midrule
+
+Independent & Works with the robot stationary and without following. \\ \addlinespace[3pt]
+
+Negotiable & How the call is announced and answered is left open. \\ \addlinespace[3pt]
+
+Valuable & The resident stays in control of their own privacy. \\ \addlinespace[3pt]
+
+Estimable & One incoming call from one named caregiver. \\ \addlinespace[3pt]
+
+Small & Accept, decline or end a single call. \\ \addlinespace[3pt]
+
+Testable & AC-01.1 and AC-02.2. \\ \addlinespace[3pt]
+
+\bottomrule
+\end{tabular}
+
+\endgroup
+\end{minipage}
+\par\medskip
+
+\par\medskip
+\begin{minipage}{\linewidth}
+\subsection*{US-03 - Understand why a call didn't connect}
+
+\textbf{Category:} Secondary - remote family caregiver. \textbf{Story:} As a family caregiver who lives in another city, I want to know whether my parent declined my call, didn't answer, or the robot lost its connection, so that I don't mistake a dropped call for my parent being fine or being in trouble.
+
+\begingroup\small
+
+\begin{tabular}{@{}>{\RaggedRight\arraybackslash}p{0.2\linewidth}>{\RaggedRight\arraybackslash}p{0.75\linewidth}@{}}
+
+\toprule\textbf{INVEST} & \textbf{Self-check}\\\midrule
+
+Independent & Can be tested with simulated call outcomes, without the robot moving. \\ \addlinespace[3pt]
+
+Negotiable & Wording and layout of each outcome are left open, as long as each one looks different. \\ \addlinespace[3pt]
+
+Valuable & The caregiver can decide whether to try again, call another way, or wait. \\ \addlinespace[3pt]
+
+Estimable & Four outcomes: connected, declined, no answer, connection lost. \\ \addlinespace[3pt]
+
+Small & One call attempt; emergency alerts and health monitoring are excluded. \\ \addlinespace[3pt]
+
+Testable & UC-02 and AC-02.1 to AC-02.3. \\ \addlinespace[3pt]
+
+\bottomrule
+\end{tabular}
+
+\endgroup
+\end{minipage}
+\par\medskip
+
+\par\medskip
+\begin{minipage}{\linewidth}
+\subsection*{US-04 - Don't get followed by mistake}
+
+\textbf{Category:} Hidden - spouse, roommate or visitor in the home. \textbf{Story:} As a spouse who shares the home, I want the robot to stop rather than start following me when I walk between it and my partner, so that it doesn't trail me around the house or run into me.
+
+\begingroup\small
+
+\begin{tabular}{@{}>{\RaggedRight\arraybackslash}p{0.2\linewidth}>{\RaggedRight\arraybackslash}p{0.75\linewidth}@{}}
+
+\toprule\textbf{INVEST} & \textbf{Self-check}\\\midrule
+
+Independent & Can be tested with recorded camera footage before any motors are involved. \\ \addlinespace[3pt]
+
+Negotiable & How the robot tells people apart is left open. \\ \addlinespace[3pt]
+
+Valuable & Other people in the home aren't followed or bumped. \\ \addlinespace[3pt]
+
+Estimable & One other person crossing the robot's view. \\ \addlinespace[3pt]
+
+Small & One crossing event during one follow. \\ \addlinespace[3pt]
+
+Testable & AC-01.3. \\ \addlinespace[3pt]
+
+\bottomrule
+\end{tabular}
+
+\endgroup
+\end{minipage}
+\par\medskip
+
+\par\medskip
+\begin{minipage}{\linewidth}
+\subsection*{US-05 - Reach the controls from a chair}
+
+\textbf{Category:} Hidden - resident who uses a wheelchair. \textbf{Story:} As a resident who uses a wheelchair, I want to reach the robot's stop and privacy controls from my seat, so that I can end a call or stop the robot without standing up or asking for help.
+
+\begingroup\small
+
+\begin{tabular}{@{}>{\RaggedRight\arraybackslash}p{0.2\linewidth}>{\RaggedRight\arraybackslash}p{0.75\linewidth}@{}}
+
+\toprule\textbf{INVEST} & \textbf{Self-check}\\\midrule
+
+Independent & Can be tested on a bench mockup with no call or movement. \\ \addlinespace[3pt]
+
+Negotiable & Where the controls go is left open; the screen sits only about 24 cm above the floor today, so they may need to be separate from it. \\ \addlinespace[3pt]
+
+Valuable & The resident keeps control without depending on someone else. \\ \addlinespace[3pt]
+
+Estimable & Two controls tested from one seated position. \\ \addlinespace[3pt]
+
+Small & Reach and press only; screen readability is a separate story. \\ \addlinespace[3pt]
+
+Testable & A seated tester presses stop and privacy without leaning out of the chair, in 3 of 3 tries. \\ \addlinespace[3pt]
+
+\bottomrule
+\end{tabular}
+
+\endgroup
+\end{minipage}
+\par\medskip
+
+\clearpage
+
+\section{Use cases}
+
+\subsection*{UC-01 - Continue a caregiver call into another room}
+
+\textbf{Linked story:} US-01 (also covers US-02 and US-04). \textbf{Primary actor:} Resident. \textbf{Secondary actors:} Remote caregiver; other people in the home.
+
+\textbf{Preconditions:}
+
+\begin{enumerate}\setlength{\itemsep}{2pt}
+
+\item Caregiver C has the resident's permission to call, and FOLLOW is turned off.
+
+\item The robot is parked next to the resident on a cleared single-floor route.
+
+\item Both devices are online and send a heartbeat once per second.
+
+\end{enumerate}
+
+\textbf{Main success flow:}
+
+\begin{enumerate}\setlength{\itemsep}{2pt}
+
+\item \textbf{Caregiver:} Calls the resident.
+
+\item \textbf{System:} Announces the call with C's name. The camera and microphone stay off.
+
+\item \textbf{Resident:} Accepts the call.
+
+\item \textbf{System:} Starts the call and shows that the camera and microphone are on.
+
+\item \textbf{Resident:} Asks the robot to follow and walks toward another room.
+
+\item \textbf{System:} Follows the resident at no more than 0.2 m/s and keeps the call going.
+
+\item \textbf{Resident:} Stops in the new room.
+
+\item \textbf{System:} Stops within 1 m of the resident and keeps the call going.
+
+\item \textbf{Resident:} Ends the call.
+
+\item \textbf{System:} Turns off the camera and microphone, turns FOLLOW off, and shows Ended.
+
+\end{enumerate}
+
+\textbf{Alternate flow A1 - Resident declines:} At step 3, the resident declines. The system tells C the call was declined, and the camera and microphone never turn on.
+
+\textbf{Exception flow X1 - The robot loses the resident:} During step 6, the resident leaves the camera's view or another person walks between them. The robot stops and stays stopped, the call continues from where it stopped, and the screen asks the resident to restart following. It never starts following someone else on its own.
+
+\textbf{Postcondition:} The call has ended, the robot is stopped and FOLLOW is off. No audio or video was recorded.
+
+\subsection*{UC-01 acceptance criteria}
+
+\begin{enumerate}\setlength{\itemsep}{2pt}
+
+\item \textbf{AC-01.1 - Consent before camera (main flow).} \textbf{Given} the UC-01 preconditions, \textbf{When} C calls, \textbf{Then} the resident sees C's name within 2 seconds, and the camera and microphone stay off until the resident accepts.
+
+\item \textbf{AC-01.2 - Following during a call (main flow).} \textbf{Given} an active call with FOLLOW on, \textbf{When} the resident walks 5 m to another room and stops, \textbf{Then} the robot never exceeds 0.2 m/s, stops within 1 m of the resident, and the call stays connected the whole time.
+
+\item \textbf{AC-01.3 - Target lost (X1).} \textbf{Given} the robot is following during a call, \textbf{When} the resident leaves the camera's view or another person crosses between them, \textbf{Then} the robot's travel request drops to zero within 1 second, it settles within 25 mm of where it lost the resident, its speed stays under 5 mm/s for a full second within 10 seconds of the loss, the call stays connected, and the robot doesn't move again until the resident restarts following.
+
+\end{enumerate}
+
+\clearpage
+
+\subsection*{UC-02 - Find out why a call didn't connect}
+
+\textbf{Linked story:} US-03. \textbf{Primary actor:} Remote caregiver. \textbf{Secondary actors:} Resident; the robot.
+
+\textbf{Preconditions:}
+
+\begin{enumerate}\setlength{\itemsep}{2pt}
+
+\item Caregiver C has the resident's permission to call.
+
+\item The robot is online and no call is active.
+
+\end{enumerate}
+
+\textbf{Main success flow:}
+
+\begin{enumerate}\setlength{\itemsep}{2pt}
+
+\item \textbf{Caregiver:} Calls the resident.
+
+\item \textbf{System:} Shows C that the robot is ringing.
+
+\item \textbf{Resident:} Accepts the call.
+
+\item \textbf{System:} Shows C that the call is connected.
+
+\end{enumerate}
+
+\textbf{Alternate flow A1 - No answer:} At step 3, the resident doesn't respond for 60 seconds. The system stops ringing and shows C "No answer". It doesn't suggest anything about the resident's health.
+
+\textbf{Exception flow X1 - Connection lost:} At any step, no heartbeat arrives from the robot for 5 seconds. The system ends the attempt and shows C "Robot offline" with the time it was last online.
+
+\textbf{Postcondition:} C sees exactly one outcome: Connected, Declined, No answer or Robot offline.
+
+\subsection*{UC-02 acceptance criteria}
+
+\begin{enumerate}\setlength{\itemsep}{2pt}
+
+\item \textbf{AC-02.1 - Connected (main flow).} \textbf{Given} the UC-02 preconditions, \textbf{When} the resident accepts, \textbf{Then} C sees Connected within 2 seconds.
+
+\item \textbf{AC-02.2 - Declined (US-02).} \textbf{Given} the robot is ringing, \textbf{When} the resident declines, \textbf{Then} C sees Declined within 2 seconds, and the resident's camera and microphone never turned on.
+
+\item \textbf{AC-02.3 - Robot offline (X1).} \textbf{Given} the robot is ringing or connected, \textbf{When} 5 seconds pass without a heartbeat, \textbf{Then} C sees Robot offline and the time it was last online, and never sees Connected or No answer for that attempt.
+
+\end{enumerate}
+
+\end{document}

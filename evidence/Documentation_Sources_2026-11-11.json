@@ -1,0 +1,293 @@
+{
+  "date": "2026-11-11",
+  "purpose": "Provenance index for reconstructed constraints/schema documents and ethics update; source Pages were read, not modified.",
+  "user_confirmations": {
+    "ai_tools": {
+      "Austin": [
+        "Codex",
+        "Claude"
+      ],
+      "Liam": [
+        "ChatGPT"
+      ],
+      "Gavin": "No AI use for design/research reported; no broader non-use inferred"
+    },
+    "review": "Austin and Liam review and manually edit all outputs",
+    "decision_ownership": "Architecture, data model, priorities and rationale are the team's own; AI formalizes documentation",
+    "license": "MIT for team-owned code, third-party terms retained",
+    "signatures": "Individual signatures not supplied"
+  },
+  "sources": [
+    {
+      "purpose": "Scope and no-arm decision",
+      "title": "In Home Assistive Robot",
+      "url": "https://chatgpt.com/space/page_1fb1e8ba871081918852073408726806",
+      "page_id": "page_1fb1e8ba871081918852073408726806",
+      "sequence": 65,
+      "blocks": [
+        {
+          "id": "5fe26684-90c3-4a61-a00a-b18b3eb6793b",
+          "sha256": "65b3b5656391617130282ea7a127a6c2fc9c0226be3e4fcece945a9c001eddcf"
+        },
+        {
+          "id": "61ec3292-e5bb-41b4-9318-fcc1ded9e6c3",
+          "sha256": "61841c6ae6ef8dfbb8a17e1215d805719389bef81fabf7c31ae4b1ad97c973fb"
+        },
+        {
+          "id": "279755c3-0e24-422d-9a04-feadd3bd026d",
+          "sha256": "e75f76b26a5cf712cee8b75d7b6967e2b39ef3144cd7c4af38cb402dd496a80c"
+        }
+      ]
+    },
+    {
+      "purpose": "Compute placement, local authority and evidence limits",
+      "title": "Robot Compute and Runtime Implementation Plan",
+      "url": "https://chatgpt.com/space/page_7f00ad6b2bb08191b36b80c1efc7dbe6",
+      "page_id": "page_7f00ad6b2bb08191b36b80c1efc7dbe6",
+      "sequence": 0,
+      "blocks": [
+        {
+          "id": "e712e605-f936-4134-b8b5-cc1b4dab60d9",
+          "sha256": "ac8c6b33c535ad7beebde4a466188eb4f69c21b107ea8b30ad32234826d91953"
+        },
+        {
+          "id": "9f42d32a-9c34-49b6-a091-ff2debc487e5",
+          "sha256": "8ff7e8f9dd500de65e7e1d162ae45d2637e1601a36f1f284581b1a783bfb3df2"
+        },
+        {
+          "id": "4ecd85e4-1a5c-4de4-8943-bd8122a47afe",
+          "sha256": "4ca8837286cefd7e2e3b721ec7a040558e2bc90ce941555383149e32dabdfa39"
+        },
+        {
+          "id": "44439e84-af7a-40de-af99-0642c4440e50",
+          "sha256": "71d8cdd1d57440943b7f316c460f3acd860345b73bdab1de91db102578b484c7"
+        },
+        {
+          "id": "e7d9ec6d-7649-44d0-8d2b-619bca5206de",
+          "sha256": "f7f428f19f8128198d7123ce617390e1266d139fbed4b06c4b886fa59b99f08d"
+        },
+        {
+          "id": "dfa8652f-5dbf-42be-8b09-b1a336f5d57a",
+          "sha256": "961aa2a0baaf07436d9ecf53b2d4e345032f59c250864f7cda7c2898430bb398"
+        },
+        {
+          "id": "8216a763-8cfc-4ac1-a906-bd1537b16522",
+          "sha256": "88104cee2195e02c856dee81e4dcb53b19901fbb6da893f163518562d2084a10"
+        },
+        {
+          "id": "a2bb9160-0ac2-4d19-9afb-1dad2cfaadf5",
+          "sha256": "2ed570a2f71b0445e98f211311b81b9b2b1f18ba0ee87e71a1488bc5486ce9f1"
+        },
+        {
+          "id": "c99c1d94-629a-45c8-a917-7d657f3d2355",
+          "sha256": "eea65dd85bd11981959d440a502abfcb794d3eb862a0d64cbae5fb5d6cb2ec3d"
+        },
+        {
+          "id": "912b751b-bc46-4b8e-bed5-fa7f53d59602",
+          "sha256": "c4a0b0cff0b2cf3e8291e7dacee5a1b1c59fb7a9ff18ede3b2b2aa25ee6944f8"
+        },
+        {
+          "id": "d8cc252d-5536-420d-95d6-8a430ee8f058",
+          "sha256": "704bf9f9e975da4faa2347458c6794ec2523a321b79c2ed6110ca5d64de5766a"
+        }
+      ]
+    },
+    {
+      "purpose": "Licensing and retention",
+      "title": "SAM 3 API Tracking Architecture and Prototype Plan",
+      "url": "https://chatgpt.com/space/page_f87c76f0587c81919b0a5589d00bb584",
+      "page_id": "page_f87c76f0587c81919b0a5589d00bb584",
+      "sequence": 7,
+      "blocks": [
+        {
+          "id": "31cea287-53ca-43c8-a4ae-51e4d21f9640",
+          "sha256": "d49f405237a388ecd70dfb4fc5db11b64d7fbd3e3e891202aa1cd455c52f7b2d"
+        },
+        {
+          "id": "26d870f1-8070-4f39-8176-6dc5dd5af30e",
+          "sha256": "6ecdcb6345d635b491703af6923cc9ec4d3f00f2852013952dc4990f374e9c17"
+        },
+        {
+          "id": "0e4fc0a1-9317-4e3a-bf46-fcec7d287212",
+          "sha256": "ef44924d7fc5216f6f6cce55156a41cdeddde15f049174499114fa719fdcb4b6"
+        },
+        {
+          "id": "3f509e0e-0749-4bdc-85bc-633919a0a0e7",
+          "sha256": "79f202149dae560b55821dcb8c134495290e06951437d7bfa6ca9ae8e78fe571"
+        },
+        {
+          "id": "1a72b9b8-7b0d-4a8a-ba02-87fe99cba28e",
+          "sha256": "01514f0f059218442e1b5eed57eb3f5e7e51d2dad9b52e381a8da82b371a0b2f"
+        }
+      ]
+    },
+    {
+      "purpose": "Optional help/privacy",
+      "title": "Help Response and Bathroom Privacy",
+      "url": "https://chatgpt.com/space/page_7cd1dec9321881918733da8707d66e77",
+      "page_id": "page_7cd1dec9321881918733da8707d66e77",
+      "sequence": 1,
+      "blocks": [
+        {
+          "id": "39f6b021-c09f-49b2-b1fb-59a316e37cf1",
+          "sha256": "ca3b5bdb17848684a5cb9d0a1dd8018456e310722c96753ee1684bf67d3f6048"
+        },
+        {
+          "id": "6f214dc6-ed3a-4849-a985-fc8e10f38393",
+          "sha256": "c8695841de5ad30c97dc6f98e7920423c00426372926cfa8592179a8c4984bed"
+        },
+        {
+          "id": "1efbd73f-f4ed-4760-8e1c-3abbda0aebae",
+          "sha256": "b86ccb872fc9d87684a5a5f23f4ca2846910ff26d90108d5ad43bc2f1b1d87d2"
+        },
+        {
+          "id": "77fdcc6f-5112-443c-acbe-f5507c6d6ea5",
+          "sha256": "1ba3f7a4418a32f30094fe13288bc01eccba72fcb3c523f110c07c2e454e2e35"
+        },
+        {
+          "id": "c4ab5a90-3214-408c-8791-082fa66df127",
+          "sha256": "4b20edd979134ac0aa2786639e91617526f9f2e442d419b4718e135f4dc3ea79"
+        },
+        {
+          "id": "522c7caa-5a8e-4e38-bc2f-3d5748bb4676",
+          "sha256": "c3081f236ffcafb48292e668cbb248e0ce195ce6bd62a6e248220627ec007f1c"
+        }
+      ]
+    },
+    {
+      "purpose": "Stationary call/routine source and evidence",
+      "title": "Robot Caregiving Implementation and Integration",
+      "url": "https://chatgpt.com/space/page_b31b04e23e38819192c67c4f3e8c14a8",
+      "page_id": "page_b31b04e23e38819192c67c4f3e8c14a8",
+      "sequence": 16,
+      "blocks": [
+        {
+          "id": "7145c0d4-6673-4161-9c92-6110f821b090",
+          "sha256": "64c3c7791f2e8e922d3767a82e68a0f612b9902a85347bcfc27a8f0d547e21af"
+        },
+        {
+          "id": "a0a343dc-aa51-4004-b6f6-9250faec6e7a",
+          "sha256": "9a05125c6429f123df257d580fed66fe82e3ac60af94b6a5e008fad18d58873c"
+        },
+        {
+          "id": "cd9570b0-1cf4-42ca-a7fb-b69d513cbf02",
+          "sha256": "996e0497969944248861374015da5995074717e9aa8f4c2070631bba0cd80d3d"
+        },
+        {
+          "id": "4e11c72f-d0e0-4dc0-b50a-7600ac36a1de",
+          "sha256": "75f672e53de3ad55f1deb4b40694c8d3bbc9a715c3935b6d605ed320e1f2c982"
+        },
+        {
+          "id": "2e78c517-0dd6-4319-b579-33695249a5a4",
+          "sha256": "0d750ca8408ddb545bc7001e5e38bbdfe823de86c0085901f63f3cedb2807a61"
+        },
+        {
+          "id": "a8b31207-8a49-449c-9f6c-97a8d6968dc0",
+          "sha256": "3f37bf4fb33bf0b4df2365b4eedfccc375250e7f3246a702b06007511ce0342d"
+        },
+        {
+          "id": "68e52c99-bbd4-4f8a-af08-7f51077cd062",
+          "sha256": "83bc5c7db6881c98203990666715624ce7f27c25e4ed1e09795e8686b647ca00"
+        },
+        {
+          "id": "42a27953-1307-4946-b4bb-a9de11aa5e91",
+          "sha256": "56a537a8e191152bb003dec4749fd6f2775f2f4540c250aa2fe29a4f2bfddb3b"
+        },
+        {
+          "id": "9c941630-63cf-4c55-bc9d-31cb82c33712",
+          "sha256": "31e6127a1c03e31da94263b3c54c2669bc0a569c243197f033080cbf089543e8"
+        },
+        {
+          "id": "7e064e01-7779-4bc1-aa04-fe68e1bc0bbd",
+          "sha256": "366085753a8ea1fc83947357096398e742cc147d56afb1292edb91057ad8779b"
+        },
+        {
+          "id": "8058f74c-7648-42ae-b8ad-40834c2b97a1",
+          "sha256": "fdf92a44216521a5255ab4d22faa5e0a2a30a016d7a95ffff0060f175aaa141f"
+        },
+        {
+          "id": "757de914-6b7e-4055-83d6-50f39f559fe4",
+          "sha256": "25f951678cfccab0a484fd1777002e5e5e4be13a98e316776e1670e41c17f34a"
+        },
+        {
+          "id": "24e14184-d457-454d-8a13-8bd96cd41295",
+          "sha256": "6ddb40cf5eaccf816fefe034f4b3eecbf91db036c5f78d17a14bf1c3db5add0c"
+        },
+        {
+          "id": "1a8c41f8-aace-4d0b-a549-ef2bd3d3261b",
+          "sha256": "89b98fd5d5e322e5b40c730788f94b66f4f74c6262c9674d8ffed09d2415f0aa"
+        }
+      ]
+    },
+    {
+      "purpose": "Accessible consented evaluation, no participant results",
+      "title": "Resident and Caregiver Usability Kit",
+      "url": "https://chatgpt.com/space/page_962b1f1841b88191997cd128dee77cee",
+      "page_id": "page_962b1f1841b88191997cd128dee77cee",
+      "blocks": [
+        {
+          "id": "faf06018-59d3-49f5-a09a-717d6c3ab0f4",
+          "sha256": "d9c9ed42fb265bb62f9f7ff617eae33f0635c1da048bf28b2361cc5c1b899b9a"
+        },
+        {
+          "id": "1916ac84-ed8f-4c22-be83-e31bbdc9ecbc",
+          "sha256": "c661cb4333e10408d01b95626000ce7786c88c2bdcb024708c16af5fe3919b1e"
+        },
+        {
+          "id": "2ad4b0a9-8616-4a80-b2a8-f8228baf7793",
+          "sha256": "2893bae37a2d072319affb568ba2b40cf6746ea3c9ad2a19919fa6cf92a6022e"
+        },
+        {
+          "id": "3763f84d-4704-48c8-91d8-9fcd3b6f69da",
+          "sha256": "63af2aa389dab6ef74d65c013f626ced794d975ffc723cc191da8d88c97ea3e0"
+        },
+        {
+          "id": "fa2b4a49-21b3-4ab7-96a5-49df4b3cee9d",
+          "sha256": "fcd2ef46c6babd7ef6719c26dfac5cc559bde4da8c7c7ddc76bce339d50ffc22"
+        }
+      ]
+    }
+  ],
+  "scope_limits": [
+    "No original Assignment #7 rubric/prior essay supplied; eight-area outline is a current reconstruction.",
+    "Local stationary-call manifests/README inspected; newer routine runtime evidence read from Space.",
+    "Reported prototype tests were not rerun for document drafting.",
+    "No remote Space content, application behavior, deployment or permissions changed."
+  ],
+  "local_source_hashes": [
+    {
+      "path": "/Users/austinheiss/Documents/BeniResearch/stationary_call_20261109/package.json",
+      "sha256": "0dd45a2fede89b73dcc10d9dac6d0288a9f0bb0ab27f331867d6f5dc9fda794b"
+    },
+    {
+      "path": "/Users/austinheiss/Documents/BeniResearch/stationary_call_20261109/README.md",
+      "sha256": "f8dbaa82185b1e02d6be956deeb4c68f6c3c3ca4f91b0dcdd7d78edc38392a82"
+    },
+    {
+      "path": "/Users/austinheiss/Documents/BeniResearch/stationary_call_20261109/INTEGRATION.md",
+      "sha256": "e9e8c6e9291cf9506e2283b40f1d15de0fc1a7457c7f916ad921d91c7689b1d7"
+    },
+    {
+      "path": "/Users/austinheiss/Documents/BeniResearch/stationary_call_20261109/vendor/call_help_authority_v1_20261109/package.json",
+      "sha256": "513eb151dadbf0469464bf7a42cfb1816306dafe5d0e0b0f2ecb3221461646fb"
+    },
+    {
+      "path": "/Users/austinheiss/Documents/BeniResearch/stationary_call_20261109/vendor/call_help_authority_v1_20261109/response-adaptation.diff",
+      "sha256": "024193222f54b9c9d28a6e6e69184ea544f7e274dd7ac57e4e0fddfb6cd4daa7"
+    }
+  ],
+  "web_license_checks": [
+    {
+      "url": "https://github.com/Mondo-Robotics/open-beni/blob/main/LICENSE",
+      "finding": "Current upstream MIT; archived research pin 4545b86a131d05519050df11a424368ef9f06b4f was not retrievable, so its exact asset license remains unverified."
+    },
+    {
+      "url": "https://github.com/facebookresearch/sam3/blob/main/LICENSE",
+      "finding": "Custom SAM License, separate from hosted service agreement."
+    },
+    {
+      "url": "https://dev.meta.ai/help/policies-and-privacy/zero-data-retention",
+      "finding": "Qualified organization enablement required; Files uploads excluded."
+    }
+  ]
+}

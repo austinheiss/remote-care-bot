@@ -1,0 +1,4 @@
+# Documentation build/audit only; not the proposed robot/application stack.
+reportlab==4.4.9
+pypdf==6.10.0
+pillow==13.0.0

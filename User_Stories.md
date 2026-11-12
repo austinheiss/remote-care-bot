@@ -8,7 +8,7 @@
 | Liam Patel | Mechanical Engineer |
 | Austin Heiss | Computer Science |
 
-Our robot is a compact two-wheel robot with a front-facing screen and no arm. It lets a family caregiver have a video conversation with an older or disabled adult at home, and it can follow the resident from room to room so the conversation doesn't have to end when they get up. The resident decides when calls start, when the robot follows, and when it stops.
+Our robot is a compact two-wheel robot with a front-facing screen. It lets a family caregiver have a video conversation with an older or disabled adult at home, and it can follow the resident from room to room so the conversation doesn't have to end when they get up. The resident decides when calls start, when the robot follows, and when it stops.
 
 ## 1. Stakeholder map
 

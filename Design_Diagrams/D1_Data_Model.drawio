@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Call server data model">
+    <mxGraphModel page="1" pageWidth="1400" pageHeight="1620" grid="1" gridSize="10" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="In-Home Assistive Robot | Call server data model" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=34;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="25" y="20" width="1350" height="55" />
+        </mxCell>
+        <mxCell id="goal" value="Goal: Our robot lets an older or disabled adult at home take video calls from a family caregiver and,&#10;if they want, have the robot follow them from room to room during the call. The robot stops following&#10;as soon as it loses track of them or a safety check fails." style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=25;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="45" y="90" width="1310" height="120" />
+        </mxCell>
+        <mxCell id="robot" value="Robot&#10;PK  robot_id: text&#10;last_seen_utc: timestamp or none&#10;last_sequence: integer or none" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=28;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="280" width="520" height="205" />
+        </mxCell>
+        <mxCell id="caregiver" value="Caregiver&#10;PK  caregiver_id: text&#10;display_name: text" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=28;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="825" y="280" width="520" height="205" />
+        </mxCell>
+        <mxCell id="pairing" value="Pairing&#10;PK, FK  robot_id: text&#10;PK, FK  caregiver_id: text&#10;active: boolean" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=28;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="405" y="680" width="590" height="240" />
+        </mxCell>
+        <mxCell id="call" value="CallAttempt&#10;PK  call_id: UUID&#10;FK  (robot_id, caregiver_id) to Pairing: text&#10;UQ  request_id: UUID or none&#10;status: call status&#10;created_utc: timestamp&#10;accepted_utc, ended_utc: timestamp or none" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=28;fontColor=#20313B;align=center;rounded=1;fillColor=#EAF4FA;strokeColor=#126D9B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="320" y="1100" width="760" height="320" />
+        </mxCell>
+        <mxCell id="robot_pairing" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=none;startArrow=none;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.211864406779661;entryY=0.0;entryPerimeter=0;" edge="1" parent="1" source="robot" target="pairing">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="315" y="585" />
+              <mxPoint x="530" y="585" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="caregiver_pairing" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=none;startArrow=none;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.788135593220339;entryY=0.0;entryPerimeter=0;" edge="1" parent="1" source="caregiver" target="pairing">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1085" y="585" />
+              <mxPoint x="870" y="585" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pairing_call" style="html=0;edgeStyle=none;rounded=0;strokeWidth=2;strokeColor=#20313B;endArrow=none;startArrow=none;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;" edge="1" parent="1" source="pairing" target="call">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r1" value="1" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=26;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="215" y="490" width="90" height="42" />
+        </mxCell>
+        <mxCell id="rn" value="0..*" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=26;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="390" y="635" width="120" height="42" />
+        </mxCell>
+        <mxCell id="c1" value="1" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=26;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1090" y="490" width="90" height="42" />
+        </mxCell>
+        <mxCell id="cn" value="0..*" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=26;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="900" y="635" width="120" height="42" />
+        </mxCell>
+        <mxCell id="p1" value="1" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=26;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="715" y="925" width="90" height="42" />
+        </mxCell>
+        <mxCell id="pn" value="0..*" style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=26;fontColor=#20313B;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="715" y="1055" width="120" height="42" />
+        </mxCell>
+        <mxCell id="legend" value="Legend: blue boxes are entities; each line is a relationship.&#10;PK = primary key; FK = foreign key; UQ = unique with caregiver_id; 1 = exactly one; 0..* = zero or more.&#10;Each call belongs to one pairing. A pairing is account eligibility, not resident consent." style="html=0;whiteSpace=wrap;fontFamily=Times New Roman;fontSize=25;fontColor=#20313B;align=center;rounded=0;fillColor=#F7F9FA;strokeColor=#C9D2D7;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="1465" width="1290" height="125" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

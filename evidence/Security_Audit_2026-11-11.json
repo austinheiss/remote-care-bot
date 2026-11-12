@@ -1,0 +1,103 @@
+{
+  "audit_date": "2026-11-11",
+  "base_head": "ff032256a43dfd7f6733bfa6ec2aa4080dd3c849",
+  "reachable_commits": 11,
+  "refs": [
+    "refs/heads/main ff032256a43dfd7f6733bfa6ec2aa4080dd3c849",
+    "refs/remotes/origin/HEAD e27bb2ac5b66d73669d454a0b0706781be4cd44d",
+    "refs/remotes/origin/main e27bb2ac5b66d73669d454a0b0706781be4cd44d",
+    "refs/tags/week04 e120ac7cff62011c3f96b816a06a8e84e5ba0142"
+  ],
+  "rules": [
+    "private-key",
+    "aws-access-id",
+    "github-token",
+    "provider-token",
+    "jwt-literal",
+    "url-credential",
+    "credential-assignment"
+  ],
+  "script_sha256": "8d4b9160692c52266656b578374803ae9bac821e56504b60d5e5836e7d6a4407",
+  "counts": {
+    "unique_history_blobs": 60,
+    "payloads": 117,
+    "text_payloads": 79,
+    "pdf_text_extractions": 24,
+    "worktree_files": 47
+  },
+  "unresolved_candidates": [],
+  "documented_placeholder_matches": [
+    {
+      "origin": "git:6a488371edce:Design_Diagrams/D0_High_Level_Design.pdf",
+      "line": 243,
+      "rule": "credential-assignment"
+    },
+    {
+      "origin": "git:fc2edf80520c:Design_Diagrams/D0_High_Level_Design.tex",
+      "line": 177,
+      "rule": "credential-assignment"
+    },
+    {
+      "origin": "git:55f2c3141317:Design_Diagrams/Design_Diagrams_Consolidated.pdf",
+      "line": 405,
+      "rule": "credential-assignment"
+    },
+    {
+      "origin": "git:270fca64d70c:Design_Diagrams/D1_Detailed_Design.pdf",
+      "line": 261,
+      "rule": "credential-assignment"
+    },
+    {
+      "origin": "git:b246f41dff0b:Design_Diagrams/D1_Detailed_Design.tex",
+      "line": 179,
+      "rule": "credential-assignment"
+    },
+    {
+      "origin": "worktree:Design_Diagrams/D0_High_Level_Design.md",
+      "line": 70,
+      "rule": "credential-assignment"
+    },
+    {
+      "origin": "worktree:Design_Diagrams/D0_High_Level_Design.pdf",
+      "line": 243,
+      "rule": "credential-assignment"
+    },
+    {
+      "origin": "worktree:Design_Diagrams/D0_High_Level_Design.tex",
+      "line": 177,
+      "rule": "credential-assignment"
+    },
+    {
+      "origin": "worktree:Design_Diagrams/D0_LaTeX_Source.zip:Design_Diagrams/D0_High_Level_Design.tex",
+      "line": 175,
+      "rule": "credential-assignment"
+    },
+    {
+      "origin": "worktree:Design_Diagrams/D0_LaTeX_Source.zip:Design_Diagrams/D0_High_Level_Design.md",
+      "line": 70,
+      "rule": "credential-assignment"
+    },
+    {
+      "origin": "worktree:Design_Diagrams/Design_Diagrams_Consolidated.pdf",
+      "line": 405,
+      "rule": "credential-assignment"
+    }
+  ],
+  "unsupported_payloads": [
+    "git:e5ea9068c0cf:Design_Diagrams/D0_block_diagram.png: binary (no OCR or binary decoding)",
+    "git:f0ae5662b45e:Design_Diagrams/D0_data_flow_A_call.png: binary (no OCR or binary decoding)",
+    "git:47588b8cfc53:Design_Diagrams/D0_data_flow_B_follow.png: binary (no OCR or binary decoding)",
+    "git:c5e4a40940c9:Design_Diagrams/D1_Data_Model.png: binary (no OCR or binary decoding)",
+    "git:01aece1018f3:Design_Diagrams/D1_Data_Model.png: binary (no OCR or binary decoding)",
+    "worktree:.DS_Store: binary (no OCR or binary decoding)",
+    "worktree:Design_Diagrams/D0_LaTeX_Source.zip:Design_Diagrams/D0_block_diagram.png: binary (no OCR or binary decoding)",
+    "worktree:Design_Diagrams/D0_LaTeX_Source.zip:Design_Diagrams/D0_data_flow_A_call.png: binary (no OCR or binary decoding)",
+    "worktree:Design_Diagrams/D0_LaTeX_Source.zip:Design_Diagrams/D0_data_flow_B_follow.png: binary (no OCR or binary decoding)",
+    "worktree:Design_Diagrams/D0_block_diagram.png: binary (no OCR or binary decoding)",
+    "worktree:Design_Diagrams/D0_data_flow_A_call.png: binary (no OCR or binary decoding)",
+    "worktree:Design_Diagrams/D0_data_flow_B_follow.png: binary (no OCR or binary decoding)",
+    "worktree:Design_Diagrams/D1_Data_Model.png: binary (no OCR or binary decoding)"
+  ],
+  "extraction_errors": [],
+  "limits": "Local refs/reflogs only; remote not fetched; no unreachable objects, external prototypes, OCR, runtime/config inspection, entropy scan, or credential validity checks. Binary exclusions listed. Match values are never printed."
+}
