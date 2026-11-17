@@ -1,7 +1,7 @@
 # Remote Care Bot — draft run sheet
 
 ## Timing and roles
-Working limit: **10:00 presenting + 5:00 questions**, instructor confirmation pending. Main deck contains 10 slides. Backup slides are outside the speaking clock. Proposed allocations are exactly **200 seconds per teammate**, not a record of agreed roles or actual rehearsal. Liam is the proposed timekeeper. Cut content rather than speak faster if rehearsal exceeds the limit.
+Working limit: **10:00 presenting + 5:00 questions**, instructor confirmation pending. Main deck contains 10 slides. No backup slides are included. D1/D2 diagrams remain separately on hand. Proposed allocations are exactly **200 seconds per teammate**, not a record of agreed roles or actual rehearsal. Liam is the proposed timekeeper. Cut content rather than speak faster if rehearsal exceeds the limit.
 
 | Slide | Title | Content cues | Visual | Speaker | Start | Seconds | Handoff line |
 |---|---|---|---|---|---|---:|---|
@@ -10,7 +10,7 @@ Working limit: **10:00 presenting + 5:00 questions**, instructor confirmation pe
 | 3 | Project abstract | Calling, resident control, following | Highlighted key-term summary | Austin | 1:15 | 45 | Gavin will show two resident tasks. |
 | 4 | User stories and D0 | Accept call, optional following, local controls | Simplified editable D0 | Gavin | 2:00 | 75 | Liam will explain the constraints. |
 | 5 | Major constraints | Local controls, exclusions, cost, accessibility | Requirements with IDs | Liam | 3:15 | 60 | Austin will separate progress from open risks. |
-| 6 | Project progress | Docs, four simulation families, limitations | Evidence-based progress list; optional backup image | Austin | 4:15 | 90 | Liam will cover the proposed term goals. |
+| 6 | Project progress | Docs, four simulation families, limitations | Evidence-based progress list and actual simulation image | Austin | 4:15 | 90 | Liam will cover the proposed term goals. |
 | 7 | End-of-term accomplishments | Hardware, physical tests, integration | Proposed milestone list | Liam | 5:45 | 65 | Gavin will explain ownership. |
 | 8 | Division of work | D0 responsibilities, missing Assignment6 matrix | Named responsibilities | Gavin | 6:50 | 40 | Liam will walk through the demo. |
 | 9 | Expected Expo demo | Accept, follow, stop, restart, privacy/fallback | Proposed demo sequence | Liam 45s; Austin 30s | 7:30 | 75 | Austin: We will now explain recording and review. |
