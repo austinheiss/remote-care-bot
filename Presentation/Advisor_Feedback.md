@@ -8,7 +8,7 @@
 | Duration | 50 minutes |
 | Attendees | Andrea Vance (advisor), Austin Heiss (CS), Gavin Lamphier (ID), Liam Patel (ME) |
 | Format | Online meeting over Microsoft Teams: the team walked through the slide deck, then had an open discussion and questions with the advisor |
-| Deck reviewed | The final deck, same version as submitted: 12 slides (10 main + 2 backup), committed in this repo as [`senior_design.pptx`](senior_design.pptx) (PDF: [`senior design.pdf`](senior%20design.pdf)) |
+| Deck reviewed | The final deck, same version as submitted: 12 slides (10 main + 2 backup), committed in this repo as [`Presentation/senior_design.pptx`](senior_design.pptx) (PDF: [`Presentation/senior design.pdf`](senior%20design.pdf)) |
 
 Slide key used in the log: 1 Title, 2 Team, 3 Abstract, 4 User stories, 5 System overview (D0 for the room), 6 Major constraints, 7 Progress so far, 8 End of term, 9 Division of work, 10 Expo demo, 11 D0 block diagram (backup), 12 D1 data model (backup).
 
